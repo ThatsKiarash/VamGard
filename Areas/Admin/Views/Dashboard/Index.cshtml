@@ -1,0 +1,107 @@
+@{
+    ViewData["Title"] = "داشبورد";
+    var recentLoans = ViewBag.RecentLoans as IEnumerable<VamYab.Models.Loan> ?? Enumerable.Empty<VamYab.Models.Loan>();
+}
+
+<div class="row g-3 mb-4">
+    <div class="col-6 col-lg-3">
+        <div class="card stat-card-admin bg-white">
+            <div class="d-flex align-items-center gap-3">
+                <div class="icon-box" style="background:rgba(37,99,235,.1);color:#2563eb;"><i class="bi bi-bank"></i></div>
+                <div>
+                    <div class="text-muted" style="font-size:.78rem;">بانک‌ها</div>
+                    <div class="fw-bold fs-5">@ViewBag.TotalBanks</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-6 col-lg-3">
+        <div class="card stat-card-admin bg-white">
+            <div class="d-flex align-items-center gap-3">
+                <div class="icon-box" style="background:rgba(5,150,105,.1);color:#059669;"><i class="bi bi-cash-stack"></i></div>
+                <div>
+                    <div class="text-muted" style="font-size:.78rem;">وام‌ها (فعال)</div>
+                    <div class="fw-bold fs-5">@ViewBag.ActiveLoans / @ViewBag.TotalLoans</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-6 col-lg-3">
+        <div class="card stat-card-admin bg-white">
+            <div class="d-flex align-items-center gap-3">
+                <div class="icon-box" style="background:rgba(217,119,6,.1);color:#d97706;"><i class="bi bi-tags"></i></div>
+                <div>
+                    <div class="text-muted" style="font-size:.78rem;">انواع وام</div>
+                    <div class="fw-bold fs-5">@ViewBag.TotalLoanTypes</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-6 col-lg-3">
+        <div class="card stat-card-admin bg-white">
+            <div class="d-flex align-items-center gap-3">
+                <div class="icon-box" style="background:rgba(220,38,38,.1);color:#dc2626;"><i class="bi bi-envelope-at"></i></div>
+                <div>
+                    <div class="text-muted" style="font-size:.78rem;">مشترکین خبرنامه</div>
+                    <div class="fw-bold fs-5">@ViewBag.TotalSubscribers</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Recent Loans -->
+<div class="card bg-white p-4" style="border-radius:16px;border:none;box-shadow:0 2px 10px rgba(0,0,0,.05);">
+    <h6 class="fw-bold mb-3"><i class="bi bi-clock-history text-info"></i> آخرین وام‌ها</h6>
+    <table class="table table-sm mb-0">
+        <thead><tr><th>عنوان</th><th>بانک</th><th>نوع</th><th>وضعیت</th></tr></thead>
+        <tbody>
+        @foreach (var loan in recentLoans)
+        {
+            <tr>
+                <td>@loan.Title</td>
+                <td>@loan.Bank.Name</td>
+                <td>@loan.LoanType.Name</td>
+                <td>
+                    @if (loan.IsActive)
+                    {
+                        <span class="badge bg-success">فعال</span>
+                    }
+                    else
+                    {
+                        <span class="badge bg-secondary">غیرفعال</span>
+                    }
+                </td>
+            </tr>
+        }
+        </tbody>
+    </table>
+</div>
+
+<!-- Recent Visitors -->
+<div class="card bg-white p-4 mt-3" style="border-radius:16px;border:none;box-shadow:0 2px 10px rgba(0,0,0,.05);">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h6 class="fw-bold mb-0"><i class="bi bi-people text-primary"></i> آخرین بازدیدکنندگان</h6>
+        <a asp-action="ChangePassword" class="btn btn-sm btn-outline-primary"><i class="bi bi-shield-lock"></i> تغییر رمز</a>
+    </div>
+    <div style="max-height:400px;overflow-y:auto;">
+        <table class="table table-sm mb-0">
+            <thead><tr><th>IP</th><th>صفحه</th><th>زمان</th><th>مرورگر</th></tr></thead>
+            <tbody>
+            @{
+                var recentVisitors = ViewBag.RecentVisitors as IEnumerable<VamYab.Models.PageVisit> ?? Enumerable.Empty<VamYab.Models.PageVisit>();
+            }
+            @foreach (var v in recentVisitors)
+            {
+                <tr>
+                    <td style="font-size:.78rem;font-family:monospace;">@v.IpAddress</td>
+                    <td style="font-size:.78rem;max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">@v.Path</td>
+                    <td style="font-size:.78rem;">@v.VisitedAt.ToString("MM/dd HH:mm")</td>
+                    <td style="font-size:.72rem;max-width:150px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:#888;">@(v.UserAgent?.Substring(0, Math.Min(v.UserAgent?.Length ?? 0, 50)))</td>
+                </tr>
+            }
+            </tbody>
+        </table>
+    </div>
+</div>
+

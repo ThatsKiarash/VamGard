@@ -1,0 +1,101 @@
+@model List<Bank>
+@{
+    ViewData["Title"] = "بانک‌ها و ترابانک‌ها - لیست بانک‌های مجاز ایران";
+    ViewData["MetaDescription"] = "لیست کامل بانک‌های مجاز ایران و ترابانک‌ها (نئوبانک‌ها). مقایسه تسهیلات بانک ملی، ملت، صادرات، مسکن، پاسارگاد، بلوبانک، بانکینو و سایر بانک‌ها.";
+    ViewData["CanonicalUrl"] = "https://vamgard.org/Banks";
+
+    var banks = Model.Where(b => b.BankType == "bank").ToList();
+    var neobanks = Model.Where(b => b.BankType == "neobank").ToList();
+}
+
+<div class="container" style="padding-top:2rem;padding-bottom:3rem;">
+    <nav aria-label="breadcrumb" class="mb-3">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a asp-controller="Home" asp-action="Index">خانه</a></li>
+            <li class="breadcrumb-item active">بانک‌ها</li>
+        </ol>
+    </nav>
+
+    <h1 style="font-weight:800;font-size:1.6rem;margin-bottom:.5rem;">بانک‌های مجاز ایران</h1>
+    <p style="color:var(--text-muted);margin-bottom:2rem;">@banks.Count بانک و @neobanks.Count ترابانک (نئوبانک) فعال</p>
+
+    <div class="row g-4">
+        @foreach (var bank in banks)
+        {
+            var activeCount = bank.Loans.Count(l => l.IsActive);
+            <div class="col-6 col-md-4 col-lg-3">
+                <a href="/bank/@bank.Slug" class="bank-card d-block h-100">
+                    @if (!string.IsNullOrEmpty(bank.LogoUrl))
+                    {
+                        <img src="@bank.LogoUrl" alt="@bank.Name" style="width:48px;height:48px;object-fit:contain;border-radius:12px;margin-bottom:.5rem;" loading="lazy" />
+                    }
+                    else
+                    {
+                        <div class="bank-icon-box"><i class="bi bi-bank2"></i></div>
+                    }
+                    <h5 class="fw-bold mb-1" style="font-size:1rem;">@bank.Name</h5>
+                    @if (!string.IsNullOrEmpty(bank.OwnershipType))
+                    {
+                        <small style="color:var(--text-muted);font-size:.75rem;">@bank.OwnershipType</small>
+                    }
+                    <div class="mt-1">
+                        <span style="background:var(--blue-glow);color:var(--blue);padding:.25rem .7rem;border-radius:6px;font-size:.8rem;font-weight:600;">
+                            @activeCount وام فعال
+                        </span>
+                    </div>
+                </a>
+            </div>
+        }
+    </div>
+
+    @if (neobanks.Any())
+    {
+        <h2 style="font-weight:800;font-size:1.4rem;margin-top:3rem;margin-bottom:.5rem;">
+            <i class="bi bi-phone" style="color:var(--blue);"></i> ترابانک‌ها (نئوبانک‌ها)
+        </h2>
+        <p style="color:var(--text-muted);margin-bottom:2rem;">بانکداری دیجیتال از طریق اپلیکیشن موبایل</p>
+
+        <div class="row g-4">
+            @foreach (var nb in neobanks)
+            {
+                var parentBank = banks.FirstOrDefault(b => b.Id == nb.ParentBankId);
+                <div class="col-6 col-md-4 col-lg-3">
+                    <a href="/bank/@nb.Slug" class="bank-card d-block h-100" style="border-right:3px solid var(--emerald);">
+                        @if (!string.IsNullOrEmpty(nb.LogoUrl))
+                        {
+                            <img src="@nb.LogoUrl" alt="@nb.Name" style="width:48px;height:48px;object-fit:contain;border-radius:12px;margin-bottom:.5rem;" loading="lazy" />
+                        }
+                        else
+                        {
+                            <div class="bank-icon-box" style="background:linear-gradient(135deg, var(--emerald-light), var(--blue-light));color:#fff;">
+                                <i class="bi bi-phone"></i>
+                            </div>
+                        }
+                        <h5 class="fw-bold mb-1" style="font-size:1rem;">@nb.Name</h5>
+                        @if (parentBank != null)
+                        {
+                            <small style="color:var(--emerald);font-size:.75rem;font-weight:600;">
+                                <i class="bi bi-arrow-return-left"></i> @parentBank.Name
+                            </small>
+                        }
+                        @if (nb.FoundedYear.HasValue)
+                        {
+                            <small style="color:var(--text-muted);font-size:.72rem;display:block;">از سال @nb.FoundedYear</small>
+                        }
+                    </a>
+                </div>
+            }
+        </div>
+    }
+</div>
+
+<script type="application/ld+json">
+{
+    "@@context": "https://schema.org",
+    "@@type": "CollectionPage",
+    "name": "بانک‌های مجاز ایران و ترابانک‌ها",
+    "description": "لیست بانک‌های مجاز و ترابانک‌های ایران",
+    "url": "https://vamgard.org/Banks",
+    "isPartOf": { "@@type": "WebSite", "name": "وام‌گرد", "url": "https://vamgard.org" }
+}
+</script>

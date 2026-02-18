@@ -1,0 +1,46 @@
+@model List<VamYab.Models.BlogPost>
+@{
+    ViewData["Title"] = "مدیریت وبلاگ";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h5 class="fw-bold mb-0">مطالب وبلاگ</h5>
+    <a asp-action="Create" class="btn btn-primary btn-sm"><i class="bi bi-plus-lg"></i> مطلب جدید</a>
+</div>
+
+<div class="card bg-white" style="border-radius:16px;border:none;box-shadow:0 2px 10px rgba(0,0,0,.05);">
+    <div class="card-body p-0">
+        <table class="table table-hover mb-0">
+            <thead>
+                <tr><th>عنوان</th><th>وضعیت</th><th>بازدید</th><th>تاریخ</th><th>عملیات</th></tr>
+            </thead>
+            <tbody>
+            @foreach (var post in Model)
+            {
+                <tr>
+                    <td class="fw-bold">@post.Title</td>
+                    <td>
+                        @if (post.IsPublished)
+                        {
+                            <span class="badge bg-success">منتشر شده</span>
+                        }
+                        else
+                        {
+                            <span class="badge bg-secondary">پیش‌نویس</span>
+                        }
+                    </td>
+                    <td>@post.ViewCount</td>
+                    <td style="font-size:.82rem;">@post.UpdatedAt.ToString("yyyy/MM/dd")</td>
+                    <td>
+                        <a asp-action="Edit" asp-route-id="@post.Id" class="btn btn-sm btn-outline-primary"><i class="bi bi-pencil"></i></a>
+                        <form asp-action="Delete" asp-route-id="@post.Id" method="post" class="d-inline" onsubmit="return confirm('آیا مطمئنید؟')">
+                            @Html.AntiForgeryToken()
+                            <button class="btn btn-sm btn-outline-danger"><i class="bi bi-trash"></i></button>
+                        </form>
+                    </td>
+                </tr>
+            }
+            </tbody>
+        </table>
+    </div>
+</div>

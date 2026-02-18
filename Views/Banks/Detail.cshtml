@@ -1,0 +1,366 @@
+@model Bank
+@{
+    ViewData["Title"] = $"وام‌های {Model.Name} - لیست کامل تسهیلات {Model.Name}";
+    ViewData["MetaDescription"] = $"لیست کامل وام‌ها و تسهیلات {Model.Name}. مقایسه نرخ سود، مبلغ و شرایط دریافت وام‌های {Model.Name}. اطلاعات به‌روز.";
+    ViewData["MetaKeywords"] = $"وام {Model.Name}, تسهیلات {Model.Name}, نرخ سود {Model.Name}, {Model.Name}";
+    ViewData["CanonicalUrl"] = $"https://vamgard.org/bank/{Model.Slug}";
+    var loans = ViewBag.Loans as List<Loan> ?? new();
+}
+
+<div class="container" style="padding-top:2rem;padding-bottom:3rem;">
+    <nav aria-label="breadcrumb" class="mb-3">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a asp-controller="Home" asp-action="Index">خانه</a></li>
+            <li class="breadcrumb-item"><a asp-controller="Banks" asp-action="Index">بانک‌ها</a></li>
+            <li class="breadcrumb-item active">@Model.Name</li>
+        </ol>
+    </nav>
+
+    <!-- Bank Header -->
+    <div class="card mb-4" style="border:none;box-shadow:var(--shadow-md);">
+        <div class="card-body" style="padding:2rem;">
+            <div class="d-flex align-items-center gap-3 mb-3">
+                @if (!string.IsNullOrEmpty(Model.LogoUrl))
+                {
+                    <img src="@Model.LogoUrl" alt="@Model.Name" style="width:72px;height:72px;border-radius:18px;object-fit:contain;background:#fff;padding:5px;border:1px solid rgba(0,0,0,.06);" />
+                }
+                else
+                {
+                    <div style="width:72px;height:72px;border-radius:18px;background:var(--navy);color:#fff;display:flex;align-items:center;justify-content:center;font-size:2rem;"><i class="bi bi-bank2"></i></div>
+                }
+                <div>
+                    <h1 style="font-weight:800;font-size:1.5rem;margin:0;">@Model.Name</h1>
+                    @if (!string.IsNullOrEmpty(Model.Website))
+                    {
+                        <a href="@Model.Website" target="_blank" rel="nofollow noopener" style="color:var(--blue);font-size:.85rem;text-decoration:none;"><i class="bi bi-globe2"></i> @Model.Website</a>
+                    }
+                </div>
+            </div>
+            @if (!string.IsNullOrEmpty(Model.Description))
+            {
+                <p style="color:var(--text-muted);margin-bottom:1rem;font-size:.92rem;">@Model.Description</p>
+            }
+            <div class="d-flex flex-wrap gap-2">
+                @if (Model.BankType == "neobank")
+                {
+                    <span style="background:linear-gradient(135deg, rgba(5,150,105,.12), rgba(59,130,246,.12));color:var(--emerald);padding:.3rem .75rem;border-radius:8px;font-size:.84rem;font-weight:600;">
+                        <i class="bi bi-phone"></i> ترابانک
+                    </span>
+                }
+                @if (!string.IsNullOrEmpty(Model.OwnershipType) && Model.BankType != "neobank")
+                {
+                    <span style="background:rgba(100,116,139,.08);color:var(--slate);padding:.3rem .75rem;border-radius:8px;font-size:.84rem;font-weight:600;">
+                        @Model.OwnershipType
+                    </span>
+                }
+                <span style="background:var(--blue-glow);color:var(--blue);padding:.3rem .75rem;border-radius:8px;font-size:.84rem;font-weight:600;">
+                    <i class="bi bi-cash-stack"></i> @loans.Count وام فعال
+                </span>
+                @if (Model.FoundedYear.HasValue)
+                {
+                    <span style="background:rgba(5,150,105,.08);color:var(--emerald);padding:.3rem .75rem;border-radius:8px;font-size:.84rem;font-weight:600;">
+                        <i class="bi bi-calendar3"></i> تأسیس @Model.FoundedYear
+                    </span>
+                }
+                @if (Model.BranchCount.HasValue)
+                {
+                    <span style="background:rgba(217,119,6,.08);color:var(--amber);padding:.3rem .75rem;border-radius:8px;font-size:.84rem;font-weight:600;">
+                        <i class="bi bi-geo-alt"></i> @Model.BranchCount.Value.ToString("N0") شعبه
+                    </span>
+                }
+                @if (!string.IsNullOrEmpty(Model.Website))
+                {
+                    <a href="@Model.Website" target="_blank" rel="nofollow noopener" class="btn-outline-custom text-decoration-none" style="padding:.3rem .75rem;font-size:.84rem;">
+                        <i class="bi bi-box-arrow-up-left"></i> سایت رسمی
+                    </a>
+                }
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-4">
+        <!-- History + Map Column -->
+        <div class="col-lg-8">
+            @if (!string.IsNullOrEmpty(Model.History))
+            {
+                <div class="card mb-4" style="border:none;box-shadow:var(--shadow-sm);">
+                    <div class="card-body" style="padding:1.5rem;">
+                        <h2 style="font-weight:800;font-size:1.15rem;margin-bottom:1rem;display:flex;align-items:center;gap:.5rem;">
+                            <i class="bi bi-book" style="color:var(--blue);"></i> تاریخچه @Model.Name
+                        </h2>
+                        <p style="color:var(--text-muted);font-size:.9rem;line-height:2;white-space:pre-line;">@Model.History</p>
+                    </div>
+                </div>
+            }
+
+            <div class="section-header">
+                <h2 style="font-weight:800;font-size:1.2rem;">
+                    <span class="icon-box" style="background:var(--blue-glow);color:var(--blue);width:34px;height:34px;font-size:.95rem;"><i class="bi bi-cash-stack"></i></span>
+                    وام‌های @Model.Name
+                </h2>
+            </div>
+
+            @if (!loans.Any())
+            {
+                <div class="text-center py-5">
+                    <i class="bi bi-inbox" style="font-size:3.5rem;color:var(--slate-light);"></i>
+                    <p class="mt-3" style="color:var(--text-muted);">در حال حاضر وامی برای این بانک ثبت نشده.</p>
+                </div>
+            }
+            else
+            {
+                <div class="row g-3">
+                    @foreach (var loan in loans)
+                    {
+                        <div class="col-md-6">@await Html.PartialAsync("_LoanCard", loan)</div>
+                    }
+                </div>
+            }
+        </div>
+
+        <!-- Sidebar -->
+        <div class="col-lg-4">
+            <!-- Quick Info -->
+            <div class="card mb-3" style="border:none;box-shadow:var(--shadow-sm);">
+                <div class="card-body" style="padding:1.25rem;">
+                    <h3 style="font-weight:700;font-size:1rem;margin-bottom:1rem;"><i class="bi bi-info-circle" style="color:var(--blue);"></i> اطلاعات بانک</h3>
+                    <table style="width:100%;font-size:.86rem;">
+                        @if (Model.FoundedYear.HasValue)
+                        {
+                            <tr><td style="color:var(--text-muted);padding:.4rem 0;">سال تأسیس</td><td style="font-weight:600;text-align:left;">@Model.FoundedYear</td></tr>
+                        }
+                        @if (Model.BranchCount.HasValue)
+                        {
+                            <tr><td style="color:var(--text-muted);padding:.4rem 0;">تعداد شعب</td><td style="font-weight:600;text-align:left;">@Model.BranchCount.Value.ToString("N0")</td></tr>
+                        }
+                        @if (!string.IsNullOrEmpty(Model.HeadquartersCity))
+                        {
+                            <tr><td style="color:var(--text-muted);padding:.4rem 0;">مرکز اصلی</td><td style="font-weight:600;text-align:left;">@Model.HeadquartersCity</td></tr>
+                        }
+                        <tr><td style="color:var(--text-muted);padding:.4rem 0;">وام‌های فعال</td><td style="font-weight:600;text-align:left;">@loans.Count</td></tr>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Map -->
+            @if (Model.Latitude.HasValue && Model.Longitude.HasValue)
+            {
+                <div class="card mb-3" style="border:none;box-shadow:var(--shadow-sm);">
+                    <div class="card-body" style="padding:1.25rem;">
+                        <h3 style="font-weight:700;font-size:1rem;margin-bottom:.75rem;"><i class="bi bi-geo-alt" style="color:var(--emerald);"></i> موقعیت دفتر مرکزی</h3>
+                        <div id="bankMap" style="height:220px;border-radius:12px;overflow:hidden;"></div>
+                    </div>
+                </div>
+            }
+
+            @{
+                var branches = new List<dynamic>();
+                if (!string.IsNullOrEmpty(Model.BranchesJson))
+                {
+                    try { branches = System.Text.Json.JsonSerializer.Deserialize<List<dynamic>>(Model.BranchesJson) ?? new(); } catch { }
+                }
+            }
+
+            @if (branches.Any())
+            {
+                <div class="card mb-3" style="border:none;box-shadow:var(--shadow-sm);">
+                    <div class="card-body" style="padding:1.25rem;">
+                        <h3 style="font-weight:700;font-size:1rem;margin-bottom:.75rem;"><i class="bi bi-building" style="color:var(--blue);"></i> شعب @Model.Name</h3>
+                        <div style="max-height:300px;overflow-y:auto;">
+                            @foreach (var branch in branches)
+                            {
+                                <div style="padding:.5rem 0;border-bottom:1px solid rgba(0,0,0,.05);font-size:.85rem;">
+                                    <strong>@branch.GetProperty("name")</strong>
+                                    @{ var addr = ""; try { addr = branch.GetProperty("address").GetString(); } catch {} }
+                                    @if (!string.IsNullOrEmpty(addr))
+                                    {
+                                        <br/><span style="color:var(--text-muted);"><i class="bi bi-geo-alt"></i> @addr</span>
+                                    }
+                                    @{ var phone = ""; try { phone = branch.GetProperty("phone").GetString(); } catch {} }
+                                    @if (!string.IsNullOrEmpty(phone))
+                                    {
+                                        <span style="color:var(--text-muted);margin-right:.5rem;"><i class="bi bi-telephone"></i> @phone</span>
+                                    }
+                                </div>
+                            }
+                        </div>
+                    </div>
+                </div>
+            }
+
+            @if (Model.BankType != "neobank")
+            {
+                <div class="card mb-3" style="border:none;box-shadow:var(--shadow-sm);">
+                    <div class="card-body" style="padding:1.25rem;">
+                        <h3 style="font-weight:700;font-size:1rem;margin-bottom:.75rem;"><i class="bi bi-geo-alt-fill" style="color:var(--blue);"></i> نزدیک‌ترین شعبه</h3>
+                        <p style="font-size:.82rem;color:var(--text-muted);margin-bottom:.75rem;">فاصله تا نزدیک‌ترین شعبه @Model.Name را ببینید و مسیر را روی نقشه مشاهده کنید.</p>
+                        <button id="findBranchesBtn" class="btn btn-primary-custom w-100" onclick="findNearbyBranches()">
+                            <i class="bi bi-crosshair"></i> پیدا کردن نزدیک‌ترین شعبه
+                        </button>
+                        <div id="branchResult" style="display:none;margin-top:.75rem;font-size:.85rem;"></div>
+                        <div id="branchMap" style="display:none;height:300px;border-radius:12px;overflow:hidden;margin-top:.75rem;"></div>
+                    </div>
+                </div>
+            }
+            else
+            {
+                <div class="card mb-3" style="border:none;box-shadow:var(--shadow-sm);">
+                    <div class="card-body text-center" style="padding:1.25rem;">
+                        <i class="bi bi-phone" style="font-size:2rem;color:var(--blue);"></i>
+                        <p style="font-size:.85rem;color:var(--text-muted);margin-top:.5rem;">@Model.Name یک ترابانک دیجیتال است و شعبه فیزیکی ندارد.<br/>تمام خدمات از طریق اپلیکیشن موبایل ارائه می‌شود.</p>
+                        @if (!string.IsNullOrEmpty(Model.Website))
+                        {
+                            <a href="@Model.Website" target="_blank" rel="nofollow noopener" class="btn btn-primary-custom btn-sm mt-2">
+                                <i class="bi bi-download"></i> دانلود اپلیکیشن
+                            </a>
+                        }
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+@section Styles {
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+}
+@section Scripts {
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script>
+    @if (Model.Latitude.HasValue && Model.Longitude.HasValue)
+    {
+        @:var map = L.map('bankMap').setView([@Model.Latitude, @Model.Longitude], 13);
+        @:L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: '&copy; OpenStreetMap' }).addTo(map);
+        @:L.marker([@Model.Latitude, @Model.Longitude]).addTo(map).bindPopup('<b>@Model.Name</b><br/>دفتر مرکزی - @(Model.HeadquartersCity ?? "تهران")').openPopup();
+    }
+
+    var localBranches = @Html.Raw(Model.BranchesJson ?? "[]");
+
+    function haversine(lat1,lng1,lat2,lng2) {
+        var R = 6371;
+        var dLat = (lat2-lat1)*Math.PI/180;
+        var dLng = (lng2-lng1)*Math.PI/180;
+        var a = Math.sin(dLat/2)*Math.sin(dLat/2) + Math.cos(lat1*Math.PI/180)*Math.cos(lat2*Math.PI/180)*Math.sin(dLng/2)*Math.sin(dLng/2);
+        return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+    }
+
+    function findNearbyBranches() {
+        var btn = document.getElementById('findBranchesBtn');
+        var result = document.getElementById('branchResult');
+        var mapDiv = document.getElementById('branchMap');
+        btn.disabled = true;
+        btn.innerHTML = '<i class="bi bi-hourglass-split"></i> در حال جستجو...';
+        result.style.display = 'block';
+        result.innerHTML = '<span class="text-muted">در حال دریافت موقعیت شما...</span>';
+
+        if (!navigator.geolocation) {
+            result.innerHTML = '<span class="text-danger">مرورگر شما از موقعیت‌یابی پشتیبانی نمی‌کند.</span>';
+            btn.disabled = false;
+            btn.innerHTML = '<i class="bi bi-crosshair"></i> پیدا کردن نزدیک‌ترین شعبه';
+            return;
+        }
+
+        navigator.geolocation.getCurrentPosition(function(pos) {
+            var uLat = pos.coords.latitude, uLng = pos.coords.longitude;
+
+            if (localBranches.length > 0) {
+                var withDist = localBranches.filter(function(b) { return b.lat && b.lng; }).map(function(b) {
+                    b.distance = haversine(uLat, uLng, b.lat, b.lng);
+                    return b;
+                }).sort(function(a,b) { return a.distance - b.distance; });
+
+                btn.disabled = false;
+                btn.innerHTML = '<i class="bi bi-crosshair"></i> جستجوی مجدد';
+
+                if (withDist.length > 0) {
+                    var nearest = withDist.slice(0, 5);
+                    var html = '<div class="text-success fw-bold mb-2">' + nearest.length + ' شعبه نزدیک شما:</div>';
+                    nearest.forEach(function(b) {
+                        html += '<div style="padding:.3rem 0;border-bottom:1px solid rgba(0,0,0,.05);"><strong>' + b.name + '</strong> - <span class="text-primary">' + b.distance.toFixed(1) + ' کیلومتر</span>';
+                        if (b.address) html += '<br/><small class="text-muted">' + b.address + '</small>';
+                        html += '</div>';
+                    });
+                    result.innerHTML = html;
+
+                    mapDiv.style.display = 'block';
+                    var bmap = L.map('branchMap').setView([uLat, uLng], 13);
+                    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: '&copy; OpenStreetMap' }).addTo(bmap);
+                    L.marker([uLat, uLng], {
+                        icon: L.divIcon({ html: '<i class="bi bi-person-fill" style="font-size:1.5rem;color:#dc2626;"></i>', iconSize: [30,30], iconAnchor: [15,15], className: '' })
+                    }).addTo(bmap).bindPopup('موقعیت شما');
+                    nearest.forEach(function(b) {
+                        L.marker([b.lat, b.lng]).addTo(bmap).bindPopup('<b>' + b.name + '</b><br/>' + b.distance.toFixed(1) + ' کیلومتر' + (b.address ? '<br/>' + b.address : ''));
+                    });
+                    var bounds = L.latLngBounds([[uLat,uLng]].concat(nearest.map(function(b){return [b.lat,b.lng];})));
+                    bmap.fitBounds(bounds, {padding: [30,30]});
+                    setTimeout(function() { bmap.invalidateSize(); }, 200);
+                } else {
+                    result.innerHTML = '<span class="text-warning">اطلاعات مکانی شعب موجود نیست.</span>';
+                }
+            } else {
+                result.innerHTML = '<span class="text-muted">در حال جستجوی شعب...</span>';
+                fetch('/api/banks/@Model.Slug/nearby?lat=' + uLat + '&lng=' + uLng)
+                .then(function(r) { return r.json(); })
+                .then(function(data) {
+                    btn.disabled = false;
+                    btn.innerHTML = '<i class="bi bi-crosshair"></i> جستجوی مجدد';
+                    if (data.success && data.count > 0) {
+                        result.innerHTML = '<span class="text-success fw-bold">' + data.count + ' شعبه نزدیک شما پیدا شد</span>';
+                        mapDiv.style.display = 'block';
+                        var bmap = L.map('branchMap').setView([uLat, uLng], 14);
+                        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: '&copy; OpenStreetMap' }).addTo(bmap);
+                        L.marker([uLat, uLng], {
+                            icon: L.divIcon({ html: '<i class="bi bi-person-fill" style="font-size:1.5rem;color:#dc2626;"></i>', iconSize: [30,30], iconAnchor: [15,15], className: '' })
+                        }).addTo(bmap).bindPopup('موقعیت شما');
+                        data.branches.forEach(function(b) {
+                            L.marker([b.lat, b.lng]).addTo(bmap).bindPopup('<b>' + b.name + '</b>' + (b.address ? '<br/>' + b.address : ''));
+                        });
+                        setTimeout(function() { bmap.invalidateSize(); }, 200);
+                    } else {
+                        result.innerHTML = '<span class="text-warning">شعبه‌ای در شعاع ۵ کیلومتری شما پیدا نشد.</span>';
+                    }
+                })
+                .catch(function() {
+                    result.innerHTML = '<span class="text-danger">خطا در جستجو. لطفاً دوباره تلاش کنید.</span>';
+                    btn.disabled = false;
+                    btn.innerHTML = '<i class="bi bi-crosshair"></i> پیدا کردن نزدیک‌ترین شعبه';
+                });
+            }
+        }, function(err) {
+            result.innerHTML = '<span class="text-danger">دسترسی به موقعیت مکانی رد شد. لطفاً دسترسی را فعال کنید.</span>';
+            btn.disabled = false;
+            btn.innerHTML = '<i class="bi bi-crosshair"></i> پیدا کردن نزدیک‌ترین شعبه';
+        });
+    }
+    </script>
+}
+
+<script type="application/ld+json">
+{
+    "@@context": "https://schema.org",
+    "@@type": "BankOrCreditUnion",
+    "name": "@Model.Name",
+    "url": "@(Model.Website ?? $"https://vamgard.org/bank/{Model.Slug}")",
+    "description": "@(Model.Description ?? $"وام‌ها و تسهیلات {Model.Name}")",
+    @if (Model.FoundedYear.HasValue)
+    {
+        @:"foundingDate": "@Model.FoundedYear",
+    }
+    @if (Model.BranchCount.HasValue)
+    {
+        @:"numberOfEmployees": { "@@type": "QuantitativeValue", "value": @Model.BranchCount, "unitText": "شعبه" },
+    }
+    "address": { "@@type": "PostalAddress", "addressLocality": "@(Model.HeadquartersCity ?? "تهران")", "addressCountry": "IR" }
+}
+</script>
+<script type="application/ld+json">
+{
+    "@@context": "https://schema.org",
+    "@@type": "BreadcrumbList",
+    "itemListElement": [
+        { "@@type": "ListItem", "position": 1, "name": "خانه", "item": "https://vamgard.org/" },
+        { "@@type": "ListItem", "position": 2, "name": "بانک‌ها", "item": "https://vamgard.org/Banks" },
+        { "@@type": "ListItem", "position": 3, "name": "@Model.Name", "item": "https://vamgard.org/bank/@Model.Slug" }
+    ]
+}
+</script>

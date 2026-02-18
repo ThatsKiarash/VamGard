@@ -1,0 +1,11 @@
+bin/
+obj/
+publish/
+*.db
+*.db-shm
+*.db-wal
+*.user
+.vs/
+logs/
+wwwroot/uploads/blog/*
+!wwwroot/uploads/blog/.gitkeep

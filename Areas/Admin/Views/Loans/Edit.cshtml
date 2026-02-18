@@ -1,0 +1,191 @@
+@model Loan
+@{ ViewData["Title"] = $"ویرایش {Model.Title}"; }
+
+<div class="card" style="max-width: 900px;">
+    <div class="card-body p-4">
+        <form asp-action="Edit" asp-route-id="@Model.Id" method="post">
+            @Html.AntiForgeryToken()
+            <input type="hidden" asp-for="Id" />
+            <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
+
+            <div class="row g-3">
+                <div class="col-md-8">
+                    <label asp-for="Title" class="form-label fw-bold"></label>
+                    <input asp-for="Title" class="form-control" />
+                    <span asp-validation-for="Title" class="text-danger"></span>
+                </div>
+                <div class="col-md-4">
+                    <label asp-for="Slug" class="form-label fw-bold"></label>
+                    <input asp-for="Slug" class="form-control" />
+                    <span asp-validation-for="Slug" class="text-danger"></span>
+                </div>
+            </div>
+
+            <div class="row g-3 mt-1">
+                <div class="col-md-6">
+                    <label asp-for="BankId" class="form-label fw-bold"></label>
+                    <select asp-for="BankId" asp-items="@(ViewBag.Banks as SelectList)" class="form-select">
+                        <option value="">انتخاب بانک</option>
+                    </select>
+                    <span asp-validation-for="BankId" class="text-danger"></span>
+                </div>
+                <div class="col-md-6">
+                    <label asp-for="LoanTypeId" class="form-label fw-bold"></label>
+                    <select asp-for="LoanTypeId" asp-items="@(ViewBag.LoanTypes as SelectList)" class="form-select">
+                        <option value="">انتخاب نوع وام</option>
+                    </select>
+                    <span asp-validation-for="LoanTypeId" class="text-danger"></span>
+                </div>
+            </div>
+
+            <div class="mt-3">
+                <label asp-for="ShortDescription" class="form-label fw-bold"></label>
+                <textarea asp-for="ShortDescription" class="form-control" rows="2"></textarea>
+            </div>
+
+            <div class="mt-3">
+                <label asp-for="FullDescription" class="form-label fw-bold"></label>
+                <textarea asp-for="FullDescription" class="form-control" rows="5"></textarea>
+                <small class="text-muted">می‌توانید از HTML استفاده کنید</small>
+            </div>
+
+            <div class="row g-3 mt-1">
+                <div class="col-md-3">
+                    <label asp-for="InterestRate" class="form-label fw-bold"></label>
+                    <input asp-for="InterestRate" type="number" step="0.1" class="form-control" />
+                </div>
+                <div class="col-md-3">
+                    <label asp-for="MinAmount" class="form-label fw-bold"></label>
+                    <input asp-for="MinAmount" type="number" class="form-control" />
+                </div>
+                <div class="col-md-3">
+                    <label asp-for="MaxAmount" class="form-label fw-bold"></label>
+                    <input asp-for="MaxAmount" type="number" class="form-control" />
+                </div>
+                <div class="col-md-3">
+                    <label asp-for="RepaymentMonths" class="form-label fw-bold"></label>
+                    <input asp-for="RepaymentMonths" type="number" class="form-control" />
+                </div>
+            </div>
+
+            <div class="mt-3">
+                <label asp-for="Requirements" class="form-label fw-bold"></label>
+                <textarea asp-for="Requirements" class="form-control" rows="4"></textarea>
+                <small class="text-muted">می‌توانید از HTML استفاده کنید</small>
+            </div>
+
+            <div class="mt-3">
+                <label asp-for="ExternalUrl" class="form-label fw-bold"></label>
+                <input asp-for="ExternalUrl" class="form-control" placeholder="https://bank.ir/loan/..." />
+                <small class="text-muted">لینک صفحه وام در سایت رسمی بانک</small>
+            </div>
+
+            <hr />
+            <h6 class="fw-bold"><i class="bi bi-lightbulb"></i> تحلیل و بررسی (اختیاری)</h6>
+            <div class="mt-2">
+                <label asp-for="AnalysisContent" class="form-label fw-bold"></label>
+                <textarea asp-for="AnalysisContent" class="form-control" rows="5" placeholder="تحلیل تخصصی این وام..."></textarea>
+                <small class="text-muted">اگر نیاز به تحلیل داشت پر کنید - HTML مجاز</small>
+            </div>
+
+            <div class="mt-3">
+                <label asp-for="RelatedArticleIds" class="form-label fw-bold"></label>
+                <input asp-for="RelatedArticleIds" class="form-control" placeholder="1,3,5" />
+                <small class="text-muted">شناسه مقالات مرتبط با کاما جدا شوند</small>
+            </div>
+
+            <hr />
+            <h6 class="fw-bold"><i class="bi bi-calculator"></i> تنظیمات ماشین‌حساب اقساط</h6>
+            <div class="row g-3 mt-1">
+                <div class="col-md-3">
+                    <div class="form-check">
+                        <input asp-for="HasCalculator" class="form-check-input" />
+                        <label asp-for="HasCalculator" class="form-check-label fw-bold"></label>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="form-check">
+                        <input asp-for="CalcAdjustableRate" class="form-check-input" />
+                        <label asp-for="CalcAdjustableRate" class="form-check-label fw-bold"></label>
+                    </div>
+                </div>
+            </div>
+            <div class="row g-3 mt-1">
+                <div class="col-md-3">
+                    <label asp-for="CalcMinMonths" class="form-label fw-bold"></label>
+                    <input asp-for="CalcMinMonths" type="number" class="form-control" placeholder="مثلاً 6" />
+                </div>
+                <div class="col-md-3">
+                    <label asp-for="CalcMaxMonths" class="form-label fw-bold"></label>
+                    <input asp-for="CalcMaxMonths" type="number" class="form-control" placeholder="مثلاً 60" />
+                </div>
+                <div class="col-md-2">
+                    <label asp-for="CalcMonthStep" class="form-label fw-bold"></label>
+                    <input asp-for="CalcMonthStep" type="number" class="form-control" placeholder="6" />
+                </div>
+                <div class="col-md-2">
+                    <label asp-for="CalcMinRate" class="form-label fw-bold"></label>
+                    <input asp-for="CalcMinRate" type="number" step="0.1" class="form-control" />
+                </div>
+                <div class="col-md-2">
+                    <label asp-for="CalcMaxRate" class="form-label fw-bold"></label>
+                    <input asp-for="CalcMaxRate" type="number" step="0.1" class="form-control" />
+                </div>
+            </div>
+            <small class="text-muted">اگر خالی باشد از مقادیر پیش‌فرض خود وام استفاده می‌شود</small>
+
+            <hr />
+            <h6 class="fw-bold"><i class="bi bi-search"></i> تنظیمات سئو</h6>
+            <div class="row g-3">
+                <div class="col-md-6">
+                    <label asp-for="MetaTitle" class="form-label fw-bold"></label>
+                    <input asp-for="MetaTitle" class="form-control" />
+                </div>
+                <div class="col-md-6">
+                    <label asp-for="MetaDescription" class="form-label fw-bold"></label>
+                    <textarea asp-for="MetaDescription" class="form-control" rows="2"></textarea>
+                </div>
+            </div>
+            <div class="mt-3">
+                <label asp-for="MetaKeywords" class="form-label fw-bold"></label>
+                <input asp-for="MetaKeywords" class="form-control" placeholder="کلمات کلیدی با کاما جدا شوند" />
+            </div>
+
+            <div class="row g-3 mt-2">
+                <div class="col-auto">
+                    <div class="form-check">
+                        <input asp-for="IsActive" class="form-check-input" />
+                        <label asp-for="IsActive" class="form-check-label fw-bold"></label>
+                    </div>
+                </div>
+                <div class="col-auto">
+                    <div class="form-check">
+                        <input asp-for="IsFeatured" class="form-check-input" />
+                        <label asp-for="IsFeatured" class="form-check-label fw-bold"></label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="d-flex gap-2 mt-4">
+                <button type="submit" class="btn btn-primary"><i class="bi bi-check-lg"></i> ذخیره تغییرات</button>
+                <a asp-action="Index" class="btn btn-outline-secondary">انصراف</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- JSON Import/Export -->
+<div class="card bg-white p-4 mt-3" style="border-radius:16px;border:none;box-shadow:0 2px 10px rgba(0,0,0,.05);">
+    @if (TempData["Success"] != null) { <div class="alert alert-success">@TempData["Success"]</div> }
+    @if (TempData["Error"] != null) { <div class="alert alert-danger">@TempData["Error"]</div> }
+    <h6 class="fw-bold mb-3"><i class="bi bi-filetype-json"></i> ورود/خروج JSON</h6>
+    <div class="d-flex gap-2 mb-3">
+        <a asp-action="ExportJson" asp-route-id="@Model.Id" class="btn btn-sm btn-outline-primary" target="_blank"><i class="bi bi-download"></i> خروجی JSON</a>
+    </div>
+    <form asp-action="ImportJson" asp-route-id="@Model.Id" method="post">
+        @Html.AntiForgeryToken()
+        <label class="form-label">ورود JSON (فیلدهای موجود بروزرسانی می‌شوند)</label>
+        <textarea name="jsonData" class="form-control" rows="8" placeholder='{"Title":"...","InterestRate":23.0,...}' style="direction:ltr;font-family:monospace;font-size:.82rem;"></textarea>
+        <button type="submit" class="btn btn-sm btn-warning mt-2"><i class="bi bi-upload"></i> بروزرسانی از JSON</button>
+    </form>
+</div>

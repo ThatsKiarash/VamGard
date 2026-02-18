@@ -1,0 +1,117 @@
+@model VamYab.Models.BlogPost
+@{
+    ViewData["Title"] = Model.MetaTitle ?? Model.Title;
+    ViewData["MetaDescription"] = Model.MetaDescription ?? Model.Summary ?? "";
+    ViewData["MetaKeywords"] = Model.MetaKeywords ?? "";
+    ViewData["CanonicalUrl"] = $"https://vamgard.org/blog/{Model.Slug}";
+    var relatedPosts = ViewBag.RelatedPosts as List<VamYab.Models.BlogPost> ?? new();
+}
+
+<div class="section">
+    <div class="container">
+        <nav aria-label="breadcrumb" class="mb-3">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a asp-controller="Home" asp-action="Index">خانه</a></li>
+                <li class="breadcrumb-item"><a asp-controller="Blog" asp-action="Index">وبلاگ</a></li>
+                <li class="breadcrumb-item active">@Model.Title</li>
+            </ol>
+        </nav>
+
+        <div class="row g-4">
+            <div class="col-lg-8">
+                <article class="card p-4" style="border-radius:16px;">
+                    @if (!string.IsNullOrEmpty(Model.CoverImageUrl))
+                    {
+                        <img src="@Model.CoverImageUrl" alt="@Model.Title" class="mb-3" style="width:100%;max-height:400px;object-fit:cover;border-radius:12px;" loading="lazy" />
+                    }
+                    else
+                    {
+                        <div class="mb-3" style="width:100%;height:250px;border-radius:12px;background:linear-gradient(135deg,#2563eb,#059669);display:flex;align-items:center;justify-content:center;">
+                            <i class="bi bi-journal-richtext" style="font-size:4rem;color:rgba(255,255,255,.3);"></i>
+                        </div>
+                    }
+                    <h1 style="font-weight:800;font-size:1.5rem;margin-bottom:.75rem;">@Model.Title</h1>
+                    <div class="d-flex gap-3 mb-3" style="font-size:.82rem;color:var(--slate);">
+                        <span><i class="bi bi-calendar3"></i> @(Model.PublishedAt?.ToString("yyyy/MM/dd") ?? "")</span>
+                        <span><i class="bi bi-eye"></i> @Model.ViewCount بازدید</span>
+                    </div>
+                    @if (!string.IsNullOrEmpty(Model.Summary))
+                    {
+                        <p style="color:var(--text-muted);font-size:.92rem;line-height:1.8;border-right:3px solid var(--blue);padding-right:1rem;margin-bottom:1.5rem;">@Model.Summary</p>
+                    }
+                    <div class="blog-content" style="line-height:2;font-size:.92rem;">
+                        @Html.Raw(Model.Content)
+                    </div>
+                </article>
+
+                <!-- Share -->
+                <div class="card p-3 mt-3" style="border-radius:16px;">
+                    <h6 class="fw-bold mb-2"><i class="bi bi-share"></i> اشتراک‌گذاری</h6>
+                    <div class="input-group input-group-sm">
+                        <input type="text" class="form-control" value="https://vamgard.org/blog/@Model.Slug" id="shareUrl" readonly style="font-size:.78rem;direction:ltr;" />
+                        <button class="btn btn-outline-primary" onclick="navigator.clipboard.writeText(document.getElementById('shareUrl').value);this.innerHTML='<i class=\'bi bi-check\'></i>';setTimeout(()=>{this.innerHTML='<i class=\'bi bi-clipboard\'></i>'},2000);">
+                            <i class="bi bi-clipboard"></i>
+                        </button>
+                    </div>
+                    <div class="d-flex gap-2 mt-2">
+                        <a href="https://t.me/share/url?url=https://vamgard.org/blog/@Model.Slug" target="_blank" rel="nofollow" class="btn btn-sm btn-outline-primary"><i class="bi bi-telegram"></i></a>
+                        <a href="https://api.whatsapp.com/send?text=https://vamgard.org/blog/@Model.Slug" target="_blank" rel="nofollow" class="btn btn-sm btn-outline-success"><i class="bi bi-whatsapp"></i></a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-4">
+                @if (relatedPosts.Count > 0)
+                {
+                    <div class="card p-3" style="border-radius:16px;">
+                        <h6 class="fw-bold mb-3"><i class="bi bi-journal-text"></i> مطالب مرتبط</h6>
+                        @foreach (var post in relatedPosts)
+                        {
+                            <a href="/blog/@post.Slug" class="d-block p-2 mb-2" style="text-decoration:none;border-radius:10px;transition:all .2s;background:rgba(0,0,0,.02);">
+                                <div style="font-weight:600;font-size:.85rem;color:var(--text);">@post.Title</div>
+                                <div style="font-size:.75rem;color:var(--slate);">@(post.PublishedAt?.ToString("yyyy/MM/dd") ?? "")</div>
+                            </a>
+                        }
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+<script type="application/ld+json">
+{
+    "@@context": "https://schema.org",
+    "@@type": "BlogPosting",
+    "headline": "@Model.Title",
+    "description": "@(Model.Summary ?? "")",
+    "datePublished": "@(Model.PublishedAt?.ToString("yyyy-MM-dd") ?? "")",
+    "dateModified": "@Model.UpdatedAt.ToString("yyyy-MM-dd")",
+    "url": "https://vamgard.org/blog/@Model.Slug",
+    "mainEntityOfPage": "https://vamgard.org/blog/@Model.Slug",
+    @if (!string.IsNullOrEmpty(Model.CoverImageUrl))
+    {
+        @:"image": "@Model.CoverImageUrl",
+    }
+    "author": {
+        "@@type": "Organization",
+        "name": "وام‌گرد"
+    },
+    "publisher": {
+        "@@type": "Organization",
+        "name": "وام‌گرد",
+        "url": "https://vamgard.org"
+    }
+}
+</script>
+<script type="application/ld+json">
+{
+    "@@context": "https://schema.org",
+    "@@type": "BreadcrumbList",
+    "itemListElement": [
+        { "@@type": "ListItem", "position": 1, "name": "خانه", "item": "https://vamgard.org/" },
+        { "@@type": "ListItem", "position": 2, "name": "وبلاگ", "item": "https://vamgard.org/Blog" },
+        { "@@type": "ListItem", "position": 3, "name": "@Model.Title", "item": "https://vamgard.org/blog/@Model.Slug" }
+    ]
+}
+</script>

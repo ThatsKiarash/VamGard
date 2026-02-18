@@ -1,0 +1,131 @@
+@model VamYab.Models.LoginViewModel
+@{
+    Layout = null;
+    ViewData["Title"] = "ورود به پنل مدیریت";
+}
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ورود | وام‌گرد - پنل مدیریت</title>
+    <meta name="robots" content="noindex, nofollow" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.rtl.min.css" rel="stylesheet" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@100..900&display=swap" rel="stylesheet" />
+    <style>
+        * { font-family: 'Vazirmatn', Tahoma, sans-serif; }
+        body {
+            min-height: 100vh;
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #0f172a 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+        }
+        body::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background:
+                radial-gradient(ellipse 50% 40% at 20% 80%, rgba(37,99,235,.15), transparent),
+                radial-gradient(ellipse 40% 50% at 80% 20%, rgba(5,150,105,.1), transparent);
+        }
+        .login-card {
+            background: rgba(255,255,255,.95);
+            backdrop-filter: blur(20px);
+            border-radius: 24px;
+            padding: 2.5rem;
+            width: 100%;
+            max-width: 420px;
+            box-shadow: 0 25px 60px rgba(0,0,0,.3);
+            position: relative;
+            z-index: 2;
+        }
+        .login-brand {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+        .login-brand h2 {
+            font-weight: 900;
+            font-size: 1.8rem;
+            color: #0f172a;
+        }
+        .login-brand h2 span {
+            background: linear-gradient(135deg, #2563eb, #059669);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .login-brand small {
+            color: #64748b;
+            font-size: .85rem;
+        }
+        .form-floating .form-control {
+            border-radius: 12px;
+            border: 2px solid #e2e8f0;
+            padding: .75rem 1rem;
+            font-size: .9rem;
+            transition: all .2s;
+        }
+        .form-floating .form-control:focus {
+            border-color: #2563eb;
+            box-shadow: 0 0 0 4px rgba(37,99,235,.1);
+        }
+        .btn-login {
+            width: 100%;
+            background: linear-gradient(135deg, #2563eb, #1d4ed8);
+            color: #fff;
+            border: none;
+            border-radius: 12px;
+            padding: .85rem;
+            font-weight: 700;
+            font-size: .95rem;
+            transition: all .3s;
+        }
+        .btn-login:hover {
+            background: linear-gradient(135deg, #3b82f6, #2563eb);
+            box-shadow: 0 8px 25px rgba(37,99,235,.35);
+            transform: translateY(-1px);
+            color: #fff;
+        }
+        .form-check-label { font-size: .85rem; color: #64748b; }
+        .validation-summary-errors ul { list-style: none; padding: 0; margin: 0; }
+        .validation-summary-errors li { color: #dc2626; font-size: .85rem; }
+    </style>
+</head>
+<body>
+    <div class="login-card">
+        <div class="login-brand">
+            <h2><i class="bi bi-arrow-repeat" style="color: #d97706;"></i> <span>وام‌گرد</span></h2>
+            <small>ورود به پنل مدیریت</small>
+        </div>
+
+        <div asp-validation-summary="All" class="validation-summary-errors mb-3"></div>
+
+        <form asp-action="Login" asp-route-returnUrl="@ViewBag.ReturnUrl" method="post">
+            <div class="form-floating mb-3">
+                <input asp-for="Username" class="form-control" id="username" placeholder="نام کاربری" autofocus />
+                <label for="username"><i class="bi bi-person"></i> نام کاربری</label>
+            </div>
+            <div class="form-floating mb-3">
+                <input asp-for="Password" class="form-control" id="password" placeholder="رمز عبور" />
+                <label for="password"><i class="bi bi-lock"></i> رمز عبور</label>
+            </div>
+            <div class="form-check mb-3">
+                <input asp-for="RememberMe" class="form-check-input" id="remember" />
+                <label class="form-check-label" for="remember">مرا به خاطر بسپار</label>
+            </div>
+            <button type="submit" class="btn btn-login">
+                <i class="bi bi-box-arrow-in-right"></i> ورود
+            </button>
+        </form>
+
+        <div class="text-center mt-3">
+            <a href="/" style="color:#64748b;font-size:.82rem;text-decoration:none;">
+                <i class="bi bi-globe2"></i> بازگشت به سایت
+            </a>
+        </div>
+    </div>
+</body>
+</html>

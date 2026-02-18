@@ -1,0 +1,241 @@
+@model Bank
+@{
+    ViewData["Title"] = $"ویرایش {Model.Name}";
+    var parentBanks = ViewBag.ParentBanks as IEnumerable<dynamic> ?? Enumerable.Empty<dynamic>();
+}
+
+<div class="card bg-white" style="max-width:800px;border-radius:16px;border:none;box-shadow:0 2px 10px rgba(0,0,0,.05);">
+    <div class="card-body p-4">
+        <h5 class="fw-bold mb-3">ویرایش: @Model.Name</h5>
+        <form asp-action="Edit" asp-route-id="@Model.Id" method="post">
+            @Html.AntiForgeryToken()
+            <input type="hidden" asp-for="Id" />
+            <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
+
+            <div class="row g-3">
+                <div class="col-md-8">
+                    <label asp-for="Name" class="form-label fw-bold"></label>
+                    <input asp-for="Name" class="form-control" />
+                    <span asp-validation-for="Name" class="text-danger"></span>
+                </div>
+                <div class="col-md-4">
+                    <label asp-for="Slug" class="form-label fw-bold"></label>
+                    <input asp-for="Slug" class="form-control" />
+                    <span asp-validation-for="Slug" class="text-danger"></span>
+                </div>
+
+                <div class="col-md-8">
+                    <label asp-for="LogoUrl" class="form-label fw-bold"></label>
+                    <input asp-for="LogoUrl" class="form-control" id="logoUrlInput" oninput="updateLogoPreview()" />
+                </div>
+                <div class="col-md-4 d-flex align-items-end">
+                    <div id="logoPreview" style="width:60px;height:60px;border-radius:14px;border:1px solid #ddd;display:flex;align-items:center;justify-content:center;background:#fff;overflow:hidden;">
+                        @if (!string.IsNullOrEmpty(Model.LogoUrl))
+                        {
+                            <img src="@Model.LogoUrl" style="width:100%;height:100%;object-fit:contain;" />
+                        }
+                        else
+                        {
+                            <i class="bi bi-image text-muted"></i>
+                        }
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <label asp-for="Website" class="form-label fw-bold"></label>
+                    <input asp-for="Website" class="form-control" />
+                </div>
+                <div class="col-md-3">
+                    <label asp-for="BankType" class="form-label fw-bold"></label>
+                    <select asp-for="BankType" class="form-select">
+                        <option value="bank">بانک</option>
+                        <option value="neobank">ترابانک (نئوبانک)</option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label asp-for="OwnershipType" class="form-label fw-bold"></label>
+                    @{
+                        var ownershipTypes = new[] { "", "دولتی", "نیمه‌دولتی", "خصوصی", "سهامی عام", "ترابانک" };
+                        var ownershipLabels = new[] { "انتخاب کنید", "دولتی", "نیمه‌دولتی", "خصوصی", "سهامی عام", "ترابانک" };
+                    }
+                    <select asp-for="OwnershipType" class="form-select">
+                        @for (int i = 0; i < ownershipTypes.Length; i++)
+                        {
+                            if (ownershipTypes[i] == Model.OwnershipType)
+                            {
+                                <option value="@ownershipTypes[i]" selected>@ownershipLabels[i]</option>
+                            }
+                            else
+                            {
+                                <option value="@ownershipTypes[i]">@ownershipLabels[i]</option>
+                            }
+                        }
+                    </select>
+                </div>
+
+                <div class="col-md-6">
+                    <label asp-for="ParentBankId" class="form-label fw-bold"></label>
+                    <select asp-for="ParentBankId" class="form-select">
+                        <option value="">بدون بانک مادر</option>
+                        @foreach (var b in parentBanks)
+                        {
+                            if (Model.ParentBankId == (int)b.Id)
+                            {
+                                <option value="@b.Id" selected>@b.Name</option>
+                            }
+                            else
+                            {
+                                <option value="@b.Id">@b.Name</option>
+                            }
+                        }
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label asp-for="DisplayOrder" class="form-label fw-bold"></label>
+                    <input asp-for="DisplayOrder" type="number" class="form-control" />
+                </div>
+                <div class="col-md-3 d-flex align-items-end">
+                    <div class="form-check">
+                        <input asp-for="IsActive" class="form-check-input" />
+                        <label asp-for="IsActive" class="form-check-label fw-bold"></label>
+                    </div>
+                </div>
+
+                <div class="col-12">
+                    <label asp-for="Description" class="form-label fw-bold"></label>
+                    <textarea asp-for="Description" class="form-control" rows="3"></textarea>
+                </div>
+                <div class="col-12">
+                    <label asp-for="History" class="form-label fw-bold"></label>
+                    <textarea asp-for="History" class="form-control" rows="6" placeholder="تاریخچه کامل بانک..."></textarea>
+                </div>
+
+                <div class="col-md-4">
+                    <label asp-for="FoundedYear" class="form-label fw-bold"></label>
+                    <input asp-for="FoundedYear" type="number" class="form-control" />
+                </div>
+                <div class="col-md-4">
+                    <label asp-for="BranchCount" class="form-label fw-bold"></label>
+                    <input asp-for="BranchCount" type="number" class="form-control" />
+                </div>
+                <div class="col-md-4">
+                    <label asp-for="HeadquartersCity" class="form-label fw-bold"></label>
+                    <input asp-for="HeadquartersCity" class="form-control" />
+                </div>
+
+                <div class="col-12">
+                    <label asp-for="Address" class="form-label fw-bold"></label>
+                    <input asp-for="Address" class="form-control" placeholder="آدرس کامل دفتر مرکزی" />
+                </div>
+                <div class="col-md-4">
+                    <label asp-for="PhoneNumber" class="form-label fw-bold"></label>
+                    <input asp-for="PhoneNumber" class="form-control" placeholder="021-..." />
+                </div>
+                <div class="col-md-4">
+                    <label asp-for="Email" class="form-label fw-bold"></label>
+                    <input asp-for="Email" class="form-control" type="email" />
+                </div>
+                <div class="col-md-4"></div>
+
+                <hr />
+                <h6 class="fw-bold"><i class="bi bi-search"></i> تنظیمات سئو</h6>
+                <div class="col-md-6">
+                    <label asp-for="MetaTitle" class="form-label fw-bold"></label>
+                    <input asp-for="MetaTitle" class="form-control" />
+                </div>
+                <div class="col-md-6">
+                    <label asp-for="MetaDescription" class="form-label fw-bold"></label>
+                    <textarea asp-for="MetaDescription" class="form-control" rows="2"></textarea>
+                </div>
+
+                <hr />
+                <h6 class="fw-bold"><i class="bi bi-geo-alt"></i> لیست شعب</h6>
+                <div class="col-12">
+                    <label asp-for="BranchesJson" class="form-label fw-bold"></label>
+                    <textarea asp-for="BranchesJson" class="form-control" rows="6" style="direction:ltr;font-family:monospace;font-size:.82rem;" placeholder='[{"name":"شعبه مرکزی","address":"تهران، خیابان...","lat":35.69,"lng":51.39,"phone":"021..."}]'></textarea>
+                    <small class="text-muted">آرایه JSON شعب - هر شعبه شامل name, address, lat, lng, phone</small>
+                </div>
+
+                <div class="col-md-5">
+                    <label asp-for="Latitude" class="form-label fw-bold"></label>
+                    <input asp-for="Latitude" type="number" step="any" class="form-control" id="latInput" />
+                </div>
+                <div class="col-md-5">
+                    <label asp-for="Longitude" class="form-label fw-bold"></label>
+                    <input asp-for="Longitude" type="number" step="any" class="form-control" id="lngInput" />
+                </div>
+                <div class="col-md-2 d-flex align-items-end">
+                    <button type="button" class="btn btn-outline-primary btn-sm w-100" onclick="toggleMapPicker()">
+                        <i class="bi bi-geo-alt"></i> نقشه
+                    </button>
+                </div>
+                <div class="col-12" id="mapPickerContainer" style="display:none;">
+                    <div id="mapPicker" style="height:300px;border-radius:12px;overflow:hidden;border:1px solid #ddd;"></div>
+                    <small class="text-muted">روی نقشه کلیک کنید تا مختصات ثبت شود</small>
+                </div>
+            </div>
+
+            <div class="mt-4 d-flex gap-2">
+                <button type="submit" class="btn btn-primary"><i class="bi bi-check-lg"></i> ذخیره تغییرات</button>
+                <a asp-action="Index" class="btn btn-outline-secondary">انصراف</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- JSON Import/Export -->
+<div class="card bg-white p-4 mt-3" style="border-radius:16px;border:none;box-shadow:0 2px 10px rgba(0,0,0,.05);">
+    @if (TempData["Success"] != null) { <div class="alert alert-success">@TempData["Success"]</div> }
+    @if (TempData["Error"] != null) { <div class="alert alert-danger">@TempData["Error"]</div> }
+    <h6 class="fw-bold mb-3"><i class="bi bi-filetype-json"></i> ورود/خروج JSON</h6>
+    <div class="d-flex gap-2 mb-3">
+        <a asp-action="ExportJson" asp-route-id="@Model.Id" class="btn btn-sm btn-outline-primary" target="_blank"><i class="bi bi-download"></i> خروجی JSON</a>
+    </div>
+    <form asp-action="ImportJson" asp-route-id="@Model.Id" method="post">
+        @Html.AntiForgeryToken()
+        <label class="form-label">ورود JSON (فیلدهای موجود بروزرسانی می‌شوند)</label>
+        <textarea name="jsonData" class="form-control" rows="8" placeholder='{"Name":"...","Website":"https://..."}' style="direction:ltr;font-family:monospace;font-size:.82rem;"></textarea>
+        <button type="submit" class="btn btn-sm btn-warning mt-2"><i class="bi bi-upload"></i> بروزرسانی از JSON</button>
+    </form>
+</div>
+
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script>
+var mapPicker, mapMarker;
+function toggleMapPicker() {
+    var c = document.getElementById('mapPickerContainer');
+    if (c.style.display === 'none') {
+        c.style.display = 'block';
+        if (!mapPicker) {
+            var lat = parseFloat(document.getElementById('latInput').value) || 35.6892;
+            var lng = parseFloat(document.getElementById('lngInput').value) || 51.3890;
+            mapPicker = L.map('mapPicker').setView([lat, lng], 12);
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: '&copy; OSM' }).addTo(mapPicker);
+            mapMarker = L.marker([lat, lng], { draggable: true }).addTo(mapPicker);
+            mapPicker.on('click', function(e) {
+                mapMarker.setLatLng(e.latlng);
+                document.getElementById('latInput').value = e.latlng.lat.toFixed(6);
+                document.getElementById('lngInput').value = e.latlng.lng.toFixed(6);
+            });
+            mapMarker.on('dragend', function() {
+                var pos = mapMarker.getLatLng();
+                document.getElementById('latInput').value = pos.lat.toFixed(6);
+                document.getElementById('lngInput').value = pos.lng.toFixed(6);
+            });
+        }
+        setTimeout(function() { mapPicker.invalidateSize(); }, 200);
+    } else {
+        c.style.display = 'none';
+    }
+}
+function updateLogoPreview() {
+    var url = document.getElementById('logoUrlInput').value;
+    var preview = document.getElementById('logoPreview');
+    if (url) {
+        preview.innerHTML = '<img src="' + url + '" style="width:100%;height:100%;object-fit:contain;" onerror="this.parentElement.innerHTML=\'<i class=bi bi-x-circle text-danger></i>\'" />';
+    } else {
+        preview.innerHTML = '<i class="bi bi-image text-muted"></i>';
+    }
+}
+</script>

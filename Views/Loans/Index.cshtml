@@ -1,0 +1,98 @@
+@model List<Loan>
+@{
+    ViewData["Title"] = "لیست وام‌های بانکی ایران - مقایسه تمام تسهیلات بانکی";
+    ViewData["MetaDescription"] = "لیست کامل و به‌روز وام‌های بانکی فعال در ایران. فیلتر بر اساس بانک، نوع وام و جستجوی متنی. مقایسه نرخ سود و شرایط وام‌ها.";
+    ViewData["CanonicalUrl"] = "https://vamgard.org/Loans";
+    var banks = ViewBag.Banks as List<Bank> ?? new();
+    var loanTypes = ViewBag.LoanTypes as List<LoanType> ?? new();
+    string? selectedBank = ViewBag.SelectedBank;
+    string? selectedType = ViewBag.SelectedType;
+    string? searchQuery = ViewBag.SearchQuery;
+}
+
+<div class="container" style="padding-top:2rem;padding-bottom:3rem;">
+    <nav aria-label="breadcrumb" class="mb-3">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a asp-controller="Home" asp-action="Index">خانه</a></li>
+            <li class="breadcrumb-item active">وام‌ها</li>
+        </ol>
+    </nav>
+
+    <h1 style="font-weight:800;font-size:1.6rem;margin-bottom:.5rem;">لیست وام‌های بانکی</h1>
+    <p style="color:var(--text-muted);margin-bottom:1.5rem;">جستجو و مقایسه انواع وام‌های بانکی فعال در ایران</p>
+
+    <div class="filter-bar">
+        <form asp-controller="Loans" asp-action="Index" method="get">
+            <div class="row g-3 align-items-end">
+                <div class="col-md-3">
+                    <label class="form-label fw-bold" style="font-size:.85rem;">جستجو</label>
+                    <input type="text" name="q" value="@searchQuery" class="form-control" placeholder="عنوان یا توضیحات..." />
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label fw-bold" style="font-size:.85rem;">بانک</label>
+                    <select name="bank" class="form-select">
+                        <option value="">همه بانک‌ها</option>
+                        @foreach (var bank in banks)
+                        {
+                            <option value="@bank.Slug" selected="@(selectedBank == bank.Slug)">@bank.Name</option>
+                        }
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label fw-bold" style="font-size:.85rem;">نوع وام</label>
+                    <select name="type" class="form-select">
+                        <option value="">همه انواع</option>
+                        @foreach (var lt in loanTypes)
+                        {
+                            <option value="@lt.Slug" selected="@(selectedType == lt.Slug)">@lt.Name</option>
+                        }
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <button type="submit" class="btn-primary-custom w-100" style="padding:.7rem;">
+                        <i class="bi bi-funnel-fill"></i> اعمال فیلتر
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <p style="color:var(--text-muted);font-size:.88rem;">
+        <strong>@Model.Count</strong> وام یافت شد
+        @if (!string.IsNullOrWhiteSpace(searchQuery))
+        {
+            <span>برای «@searchQuery»</span>
+        }
+    </p>
+
+    @if (!Model.Any())
+    {
+        <div class="text-center py-5">
+            <i class="bi bi-inbox" style="font-size:4rem;color:var(--slate-light);"></i>
+            <p class="mt-3" style="color:var(--text-muted);">وامی با این مشخصات یافت نشد. فیلترها را تغییر دهید.</p>
+        </div>
+    }
+    else
+    {
+        <div class="row g-4">
+            @foreach (var loan in Model)
+            {
+                <div class="col-md-6 col-lg-4">
+                    @await Html.PartialAsync("_LoanCard", loan)
+                </div>
+            }
+        </div>
+    }
+</div>
+
+<script type="application/ld+json">
+{
+    "@@context": "https://schema.org",
+    "@@type": "CollectionPage",
+    "name": "لیست وام‌های بانکی ایران",
+    "description": "لیست کامل وام‌های بانکی فعال در ایران",
+    "url": "https://vamgard.org/Loans",
+    "isPartOf": { "@@type": "WebSite", "name": "وام‌گرد", "url": "https://vamgard.org" },
+    "numberOfItems": @Model.Count
+}
+</script>

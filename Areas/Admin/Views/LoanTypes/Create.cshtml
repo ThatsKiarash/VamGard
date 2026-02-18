@@ -1,0 +1,44 @@
+@model LoanType
+@{ ViewData["Title"] = "افزودن نوع وام جدید"; }
+
+<div class="card" style="max-width: 700px;">
+    <div class="card-body p-4">
+        <form asp-action="Create" method="post">
+            @Html.AntiForgeryToken()
+            <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
+
+            <div class="mb-3">
+                <label asp-for="Name" class="form-label fw-bold"></label>
+                <input asp-for="Name" class="form-control" />
+                <span asp-validation-for="Name" class="text-danger"></span>
+            </div>
+            <div class="mb-3">
+                <label asp-for="Slug" class="form-label fw-bold"></label>
+                <input asp-for="Slug" class="form-control" placeholder="خالی بگذارید تا خودکار ساخته شود" />
+                <span asp-validation-for="Slug" class="text-danger"></span>
+            </div>
+            <div class="mb-3">
+                <label asp-for="Description" class="form-label fw-bold"></label>
+                <textarea asp-for="Description" class="form-control" rows="3"></textarea>
+            </div>
+            <div class="mb-3">
+                <label asp-for="IconClass" class="form-label fw-bold"></label>
+                <input asp-for="IconClass" class="form-control" placeholder="مثال: bi-house-door" />
+                <small class="text-muted">از <a href="https://icons.getbootstrap.com/" target="_blank">Bootstrap Icons</a> استفاده کنید</small>
+            </div>
+            <div class="mb-3">
+                <label asp-for="DisplayOrder" class="form-label fw-bold"></label>
+                <input asp-for="DisplayOrder" type="number" class="form-control" />
+            </div>
+            <div class="mb-3 form-check">
+                <input asp-for="IsActive" class="form-check-input" />
+                <label asp-for="IsActive" class="form-check-label fw-bold"></label>
+            </div>
+
+            <div class="d-flex gap-2">
+                <button type="submit" class="btn btn-primary"><i class="bi bi-check-lg"></i> ذخیره</button>
+                <a asp-action="Index" class="btn btn-outline-secondary">انصراف</a>
+            </div>
+        </form>
+    </div>
+</div>

@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 400">
+  <defs>
+    <linearGradient id="g1" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#0284c7;stop-opacity:1"/>
+      <stop offset="100%" style="stop-color:#0369a1;stop-opacity:1"/>
+    </linearGradient>
+  </defs>
+  <rect width="800" height="400" fill="url(#g1)"/>
+  <circle cx="680" cy="80" r="175" fill="rgba(255,255,255,.07)"/>
+  <circle cx="120" cy="320" r="125" fill="rgba(255,255,255,.05)"/>
+  <text x="400" y="170" text-anchor="middle" font-family="Tahoma,sans-serif" font-size="80" fill="rgba(255,255,255,.9)">=</text>
+  <text x="400" y="240" text-anchor="middle" font-family="Tahoma,sans-serif" font-size="28" fill="#fff" font-weight="bold" direction="rtl">F�'* H'E E3�F</text>
+  <text x="400" y="280" text-anchor="middle" font-family="Tahoma,sans-serif" font-size="16" fill="rgba(255,255,255,.7)" direction="rtl">B(D '2 /1�'A* H'E (/'F�/</text>
+</svg>

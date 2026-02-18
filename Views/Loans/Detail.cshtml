@@ -1,0 +1,431 @@
+@model Loan
+@{
+    ViewData["Title"] = Model.MetaTitle ?? $"{Model.Title} - شرایط و نرخ سود";
+    ViewData["MetaDescription"] = Model.MetaDescription ?? $"جزئیات کامل {Model.Title} از {Model.Bank.Name}. نرخ سود {(Model.InterestRate.HasValue ? Model.InterestRate + " درصد" : "")}, شرایط دریافت و مدارک مورد نیاز.";
+    ViewData["MetaKeywords"] = Model.MetaKeywords ?? $"{Model.Title}, وام {Model.Bank.Name}, {Model.LoanType.Name}, نرخ سود, شرایط وام";
+    ViewData["CanonicalUrl"] = $"https://vamgard.org/vam/{Model.Slug}";
+    ViewData["OgTitle"] = $"{Model.Title} | وام‌گرد";
+    var relatedLoans = ViewBag.RelatedLoans as List<Loan> ?? new();
+    var sameBankLoans = ViewBag.SameBankLoans as List<Loan> ?? new();
+}
+
+<div class="container" style="padding-top:2rem;padding-bottom:3rem;">
+    <nav aria-label="breadcrumb" class="mb-3">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a asp-controller="Home" asp-action="Index">خانه</a></li>
+            <li class="breadcrumb-item"><a asp-controller="Loans" asp-action="Index">وام‌ها</a></li>
+            <li class="breadcrumb-item"><a href="/type/@Model.LoanType.Slug">@Model.LoanType.Name</a></li>
+            <li class="breadcrumb-item"><a href="/bank/@Model.Bank.Slug">@Model.Bank.Name</a></li>
+            <li class="breadcrumb-item active">@Model.Title</li>
+        </ol>
+    </nav>
+
+    <article itemscope itemtype="https://schema.org/FinancialProduct">
+        <div class="row g-4">
+            <!-- محتوای اصلی -->
+            <div class="col-lg-8">
+                <div class="card" style="border:none;box-shadow:var(--shadow-md);">
+                    <div class="card-body" style="padding:2rem;">
+                        <div class="d-flex flex-wrap justify-content-between align-items-start gap-2 mb-3">
+                            <div>
+                                <h1 class="h3 fw-bold mb-2" itemprop="name" style="line-height:1.5;">@Model.Title</h1>
+                                <div class="d-flex flex-wrap gap-2">
+                                    <a href="/bank/@Model.Bank.Slug" class="bank-name" style="font-size:.85rem;" itemprop="provider" itemscope itemtype="https://schema.org/BankOrCreditUnion">
+                                        <i class="bi bi-bank2"></i>
+                                        <span itemprop="name">@Model.Bank.Name</span>
+                                    </a>
+                                    <a href="/type/@Model.LoanType.Slug" style="background:rgba(5,150,105,.1);color:var(--emerald);padding:.3rem .75rem;border-radius:8px;font-size:.85rem;font-weight:600;text-decoration:none;display:inline-flex;align-items:center;gap:.3rem;">
+                                        <i class="bi @(Model.LoanType.IconClass ?? "bi-cash-coin")"></i> @Model.LoanType.Name
+                                    </a>
+                                    @if (Model.IsFeatured)
+                                    {
+                                        <span style="background:rgba(217,119,6,.1);color:var(--amber);padding:.3rem .75rem;border-radius:8px;font-size:.85rem;font-weight:700;">
+                                            <i class="bi bi-star-fill"></i> ویژه
+                                        </span>
+                                    }
+                                </div>
+                            </div>
+                            <span class="view-count" style="font-size:.85rem;">
+                                <i class="bi bi-eye"></i> @Model.ViewCount بازدید
+                                <span style="margin-right:1rem;color:var(--slate-light);"><i class="bi bi-clock-history"></i> آخرین بروزرسانی: @Model.UpdatedAt.ToString("yyyy/MM/dd")</span>
+                            </span>
+                        </div>
+
+                        @if (!string.IsNullOrEmpty(Model.ShortDescription))
+                        {
+                            <p class="lead" style="color:var(--text-muted);font-size:1rem;border-right:3px solid var(--blue);padding-right:1rem;margin:1.5rem 0;" itemprop="description">
+                                @Model.ShortDescription
+                            </p>
+                        }
+
+                        @if (!string.IsNullOrEmpty(Model.FullDescription))
+                        {
+                            <div class="mt-4">
+                                <h2 style="font-size:1.15rem;font-weight:700;margin-bottom:1rem;display:flex;align-items:center;gap:.5rem;">
+                                    <i class="bi bi-file-text" style="color:var(--blue);"></i> توضیحات کامل
+                                </h2>
+                                <div style="color:var(--text-muted);line-height:2;white-space:pre-line;">@Model.FullDescription</div>
+                            </div>
+                        }
+
+                        @if (!string.IsNullOrEmpty(Model.Requirements))
+                        {
+                            <div class="mt-4">
+                                <h2 style="font-size:1.15rem;font-weight:700;margin-bottom:1rem;display:flex;align-items:center;gap:.5rem;">
+                                    <i class="bi bi-clipboard-check" style="color:var(--emerald);"></i> شرایط و مدارک مورد نیاز
+                                </h2>
+                                <div style="background:var(--bg);border-radius:12px;padding:1.25rem;color:var(--text-muted);line-height:2;">
+                                    @Html.Raw(Model.Requirements)
+                                </div>
+                            </div>
+                        }
+                        @if (!string.IsNullOrEmpty(Model.AnalysisContent))
+                        {
+                            <div class="mt-4">
+                                <h2 style="font-size:1.15rem;font-weight:700;margin-bottom:1rem;display:flex;align-items:center;gap:.5rem;">
+                                    <i class="bi bi-lightbulb" style="color:var(--amber);"></i> تحلیل و بررسی
+                                </h2>
+                                <div style="background:rgba(217,119,6,.04);border-radius:12px;padding:1.25rem;color:var(--text-muted);line-height:2;border:1px solid rgba(217,119,6,.1);">
+                                    @Html.Raw(Model.AnalysisContent)
+                                </div>
+                            </div>
+                        }
+
+                        @{
+                            var relatedArticles = ViewBag.RelatedArticles as List<VamYab.Models.BlogPost> ?? new();
+                        }
+                        @if (relatedArticles.Any())
+                        {
+                            <div class="mt-4">
+                                <h2 style="font-size:1.15rem;font-weight:700;margin-bottom:1rem;display:flex;align-items:center;gap:.5rem;">
+                                    <i class="bi bi-journal-text" style="color:var(--blue);"></i> مقالات مرتبط
+                                </h2>
+                                <div class="d-flex flex-column gap-2">
+                                    @foreach (var article in relatedArticles)
+                                    {
+                                        <a href="/blog/@article.Slug" style="display:flex;align-items:center;gap:.75rem;padding:.75rem 1rem;background:var(--bg);border-radius:10px;text-decoration:none;transition:all .2s;">
+                                            <i class="bi bi-file-earmark-text" style="color:var(--blue);font-size:1.2rem;"></i>
+                                            <div>
+                                                <div style="color:var(--text);font-weight:600;font-size:.9rem;">@article.Title</div>
+                                                @if (!string.IsNullOrEmpty(article.Category))
+                                                {
+                                                    <small style="color:var(--text-muted);">@article.Category</small>
+                                                }
+                                            </div>
+                                        </a>
+                                    }
+                                </div>
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+
+            <!-- ساید بار -->
+            <div class="col-lg-4">
+                <!-- مشخصات وام -->
+                <div class="card mb-4" style="border:none;box-shadow:var(--shadow-md);border-top:4px solid var(--blue);">
+                    <div class="card-body" style="padding:1.5rem;">
+                        <h3 style="font-size:1rem;font-weight:700;margin-bottom:1.25rem;">
+                            <i class="bi bi-clipboard-data" style="color:var(--blue);"></i> مشخصات وام
+                        </h3>
+                        <div class="d-flex flex-column gap-3">
+                            @if (Model.InterestRate.HasValue)
+                            {
+                                <div class="d-flex justify-content-between align-items-center" style="padding-bottom:.75rem;border-bottom:1px dashed var(--bg-alt);">
+                                    <span style="color:var(--text-muted);font-size:.88rem;"><i class="bi bi-percent"></i> نرخ سود</span>
+                                    <strong style="font-size:1.1rem;" itemprop="interestRate">@Model.InterestRate درصد</strong>
+                                </div>
+                            }
+                            @if (Model.MinAmount.HasValue)
+                            {
+                                <div class="d-flex justify-content-between align-items-center" style="padding-bottom:.75rem;border-bottom:1px dashed var(--bg-alt);">
+                                    <span style="color:var(--text-muted);font-size:.88rem;"><i class="bi bi-arrow-down-circle"></i> حداقل مبلغ</span>
+                                    <strong class="amount-display">@FormatAmount(Model.MinAmount.Value)</strong>
+                                </div>
+                            }
+                            @if (Model.MaxAmount.HasValue)
+                            {
+                                <div class="d-flex justify-content-between align-items-center" style="padding-bottom:.75rem;border-bottom:1px dashed var(--bg-alt);" itemprop="amount">
+                                    <span style="color:var(--text-muted);font-size:.88rem;"><i class="bi bi-arrow-up-circle"></i> حداکثر مبلغ</span>
+                                    <strong class="amount-display">@FormatAmount(Model.MaxAmount.Value)</strong>
+                                </div>
+                            }
+                            @if (Model.RepaymentMonths.HasValue)
+                            {
+                                <div class="d-flex justify-content-between align-items-center" style="padding-bottom:.75rem;border-bottom:1px dashed var(--bg-alt);">
+                                    <span style="color:var(--text-muted);font-size:.88rem;"><i class="bi bi-calendar3"></i> مدت بازپرداخت</span>
+                                    <strong>@Model.RepaymentMonths ماه</strong>
+                                </div>
+                            }
+                            <div class="d-flex justify-content-between align-items-center">
+                                <span style="color:var(--text-muted);font-size:.88rem;"><i class="bi bi-toggle-on"></i> وضعیت</span>
+                                @if (Model.IsActive)
+                                {
+                                    <span class="badge-status-active"><i class="bi bi-check-circle-fill"></i> فعال</span>
+                                }
+                                else
+                                {
+                                    <span class="badge-status-inactive"><i class="bi bi-x-circle-fill"></i> غیرفعال</span>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ماشین‌حساب اقساط -->
+                @if (Model.HasCalculator && Model.InterestRate.HasValue && Model.MaxAmount.HasValue)
+                {
+                    var calcMinM = Model.CalcMinMonths ?? 6;
+                    var calcMaxM = Model.CalcMaxMonths ?? Model.RepaymentMonths ?? 60;
+                    var calcStep = Model.CalcMonthStep ?? 6;
+                    <div class="card mb-4" style="border:none;box-shadow:var(--shadow-md);border-top:4px solid var(--emerald);">
+                        <div class="card-body" style="padding:1.5rem;">
+                            <h3 style="font-size:1rem;font-weight:700;margin-bottom:1.25rem;">
+                                <i class="bi bi-calculator" style="color:var(--emerald);"></i> محاسبه اقساط
+                            </h3>
+                            <div class="mb-3">
+                                <label style="font-size:.85rem;color:var(--text-muted);">مبلغ وام (تومان)</label>
+                                <input type="range" id="calcAmount" class="form-range"
+                                    min="@(Model.MinAmount ?? 0)" max="@Model.MaxAmount"
+                                    value="@Model.MaxAmount" step="@(Model.MaxAmount > 100000000 ? 10000000 : 1000000)" />
+                                <div class="text-center fw-bold" id="calcAmountDisplay" style="color:var(--blue);font-size:1.1rem;"></div>
+                            </div>
+                            <div class="mb-3">
+                                <label style="font-size:.85rem;color:var(--text-muted);">مدت بازپرداخت (ماه)</label>
+                                <input type="range" id="calcMonths" class="form-range"
+                                    min="@calcMinM" max="@calcMaxM"
+                                    value="@(Model.RepaymentMonths ?? calcMaxM)" step="@calcStep" />
+                                <div class="text-center fw-bold" id="calcMonthsDisplay" style="font-size:.95rem;"></div>
+                            </div>
+                            @if (Model.CalcAdjustableRate)
+                            {
+                                <div class="mb-3">
+                                    <label style="font-size:.85rem;color:var(--text-muted);">نرخ سود (درصد)</label>
+                                    <input type="range" id="calcRate" class="form-range"
+                                        min="@(Model.CalcMinRate ?? 4)" max="@(Model.CalcMaxRate ?? Model.InterestRate ?? 23)"
+                                        value="@Model.InterestRate" step="0.5" />
+                                    <div class="text-center fw-bold" id="calcRateDisplay" style="font-size:.95rem;color:var(--amber);"></div>
+                                </div>
+                            }
+                            <div style="background:var(--bg);border-radius:12px;padding:1rem;" id="calcResult">
+                                <div class="d-flex justify-content-between mb-2" style="font-size:.88rem;">
+                                    <span style="color:var(--text-muted);">مبلغ هر قسط:</span>
+                                    <strong id="calcInstallment" style="color:var(--emerald);"></strong>
+                                </div>
+                                <div class="d-flex justify-content-between mb-2" style="font-size:.88rem;">
+                                    <span style="color:var(--text-muted);">کل بازپرداخت:</span>
+                                    <strong id="calcTotal"></strong>
+                                </div>
+                                <div class="d-flex justify-content-between" style="font-size:.88rem;">
+                                    <span style="color:var(--text-muted);">سود پرداختی:</span>
+                                    <strong id="calcProfit" style="color:var(--red);"></strong>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <script>
+                    (function() {
+                        var defaultRate = @(Model.InterestRate);
+                        var adjustableRate = @(Model.CalcAdjustableRate ? "true" : "false");
+                        var amountEl = document.getElementById('calcAmount');
+                        var monthsEl = document.getElementById('calcMonths');
+                        var rateEl = adjustableRate ? document.getElementById('calcRate') : null;
+                        var amountDisp = document.getElementById('calcAmountDisplay');
+                        var monthsDisp = document.getElementById('calcMonthsDisplay');
+                        var rateDisp = adjustableRate ? document.getElementById('calcRateDisplay') : null;
+                        var installEl = document.getElementById('calcInstallment');
+                        var totalEl = document.getElementById('calcTotal');
+                        var profitEl = document.getElementById('calcProfit');
+
+                        function fmt(n) {
+                            if (n >= 1e9) return (n / 1e9).toFixed(1).replace(/\.0$/, '') + ' میلیارد تومان';
+                            if (n >= 1e6) return (n / 1e6).toFixed(1).replace(/\.0$/, '') + ' میلیون تومان';
+                            return Math.round(n).toLocaleString('fa') + ' تومان';
+                        }
+
+                        function calc() {
+                            var P = parseFloat(amountEl.value);
+                            var n = parseInt(monthsEl.value);
+                            var currentRate = rateEl ? parseFloat(rateEl.value) : defaultRate;
+                            var r = currentRate / 100 / 12;
+                            amountDisp.textContent = fmt(P);
+                            monthsDisp.textContent = n + ' ماه';
+                            if (rateDisp) rateDisp.textContent = currentRate + ' درصد';
+                            var monthly;
+                            if (r > 0) {
+                                monthly = P * r * Math.pow(1 + r, n) / (Math.pow(1 + r, n) - 1);
+                            } else {
+                                monthly = P / n;
+                            }
+                            var total = monthly * n;
+                            installEl.textContent = fmt(monthly);
+                            totalEl.textContent = fmt(total);
+                            profitEl.textContent = fmt(total - P);
+                        }
+                        amountEl.addEventListener('input', calc);
+                        monthsEl.addEventListener('input', calc);
+                        if (rateEl) rateEl.addEventListener('input', calc);
+                        calc();
+                    })();
+                    </script>
+                }
+
+                <!-- لینک به سایت بانک -->
+                <div class="card mb-4" style="border:none;box-shadow:var(--shadow-md);">
+                    <div class="card-body text-center" style="padding:1.5rem;">
+                        @if (!string.IsNullOrEmpty(Model.Bank.LogoUrl))
+                        {
+                            <img src="@Model.Bank.LogoUrl" alt="@Model.Bank.Name" style="width:56px;height:56px;border-radius:14px;object-fit:contain;background:#fff;padding:4px;border:1px solid rgba(0,0,0,.06);margin:0 auto .75rem;" />
+                        }
+                        else
+                        {
+                            <div style="width:56px;height:56px;border-radius:14px;background:var(--navy);color:#fff;display:flex;align-items:center;justify-content:center;font-size:1.3rem;margin:0 auto .75rem;">
+                                <i class="bi bi-bank2"></i>
+                            </div>
+                        }
+                        <h4 style="font-size:1rem;font-weight:700;">@Model.Bank.Name</h4>
+                        @if (!string.IsNullOrEmpty(Model.ExternalUrl))
+                        {
+                            <a href="@Model.ExternalUrl" target="_blank" rel="nofollow noopener" class="btn-ext-link d-block text-decoration-none mt-3" style="padding:.7rem;">
+                                <i class="bi bi-box-arrow-up-left"></i> ثبت‌نام در سایت بانک
+                            </a>
+                        }
+                        @if (!string.IsNullOrEmpty(Model.Bank.Website))
+                        {
+                            <a href="@Model.Bank.Website" target="_blank" rel="nofollow noopener" class="btn-outline-custom d-block text-decoration-none mt-2" style="padding:.7rem;">
+                                <i class="bi bi-globe2"></i> سایت @Model.Bank.Name
+                            </a>
+                        }
+                        <a href="/bank/@Model.Bank.Slug" class="d-block mt-2 text-decoration-none" style="color:var(--blue);font-size:.88rem;">
+                            سایر وام‌های @Model.Bank.Name <i class="bi bi-arrow-left"></i>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Share -->
+                <div class="card mb-4" style="border:none;box-shadow:var(--shadow-md);">
+                    <div class="card-body text-center" style="padding:1rem;">
+                        <h4 style="font-size:.88rem;font-weight:600;margin-bottom:.75rem;"><i class="bi bi-share"></i> اشتراک‌گذاری</h4>
+                        <div class="input-group input-group-sm">
+                            <input type="text" class="form-control" value="https://vamgard.org/vam/@Model.Slug" id="shareUrl" readonly style="font-size:.78rem;direction:ltr;" />
+                            <button class="btn btn-outline-primary" onclick="navigator.clipboard.writeText(document.getElementById('shareUrl').value);this.innerHTML='<i class=\'bi bi-check\'></i> کپی شد';setTimeout(()=>{this.innerHTML='<i class=\'bi bi-clipboard\'></i> کپی'},2000);">
+                                <i class="bi bi-clipboard"></i> کپی
+                            </button>
+                        </div>
+                        <div class="d-flex gap-2 justify-content-center mt-2">
+                            <a href="https://t.me/share/url?url=https://vamgard.org/vam/@Model.Slug" target="_blank" rel="nofollow" class="btn btn-sm btn-outline-primary"><i class="bi bi-telegram"></i></a>
+                            <a href="https://api.whatsapp.com/send?text=https://vamgard.org/vam/@Model.Slug" target="_blank" rel="nofollow" class="btn btn-sm btn-outline-success"><i class="bi bi-whatsapp"></i></a>
+                            <a href="https://twitter.com/intent/tweet?url=https://vamgard.org/vam/@Model.Slug" target="_blank" rel="nofollow" class="btn btn-sm btn-outline-dark"><i class="bi bi-twitter-x"></i></a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </article>
+
+    <!-- وام‌های مشابه -->
+    @if (relatedLoans.Any())
+    {
+        <section style="margin-top:3rem;">
+            <div class="section-header">
+                <h2 style="font-weight:800;font-size:1.3rem;">
+                    <span class="icon-box" style="background:var(--blue-glow);color:var(--blue);width:36px;height:36px;font-size:1rem;"><i class="bi bi-collection"></i></span>
+                    سایر @Model.LoanType.Name
+                </h2>
+            </div>
+            <div class="row g-4">
+                @foreach (var loan in relatedLoans)
+                {
+                    <div class="col-md-6 col-lg-3">
+                        @await Html.PartialAsync("_LoanCard", loan)
+                    </div>
+                }
+            </div>
+        </section>
+    }
+
+    <!-- وام‌های همین بانک -->
+    @if (sameBankLoans.Any())
+    {
+        <section style="margin-top:3rem;">
+            <div class="section-header">
+                <h2 style="font-weight:800;font-size:1.3rem;">
+                    <span class="icon-box" style="background:rgba(5,150,105,.1);color:var(--emerald);width:36px;height:36px;font-size:1rem;"><i class="bi bi-bank2"></i></span>
+                    سایر وام‌های @Model.Bank.Name
+                </h2>
+            </div>
+            <div class="row g-4">
+                @foreach (var loan in sameBankLoans)
+                {
+                    <div class="col-md-6 col-lg-3">
+                        @await Html.PartialAsync("_LoanCard", loan)
+                    </div>
+                }
+            </div>
+        </section>
+    }
+</div>
+
+<!-- Schema.org FinancialProduct -->
+<script type="application/ld+json">
+{
+    "@@context": "https://schema.org",
+    "@@type": "FinancialProduct",
+    "name": "@Model.Title",
+    "description": "@(Model.ShortDescription ?? "")",
+    "url": "https://vamgard.org/vam/@Model.Slug",
+    "provider": {
+        "@@type": "BankOrCreditUnion",
+        "name": "@Model.Bank.Name"
+        @if (!string.IsNullOrEmpty(Model.Bank.Website))
+        {
+            @:,"url": "@Model.Bank.Website"
+        }
+    },
+    "category": "@Model.LoanType.Name",
+    @if (Model.InterestRate.HasValue)
+    {
+        @:"interestRate": "@Model.InterestRate",
+    }
+    "offers": {
+        "@@type": "Offer",
+        "priceCurrency": "IRR"
+        @if (Model.MaxAmount.HasValue)
+        {
+            @:,"price": "@Model.MaxAmount"
+        }
+    }
+}
+</script>
+<!-- BreadcrumbList -->
+<script type="application/ld+json">
+{
+    "@@context": "https://schema.org",
+    "@@type": "BreadcrumbList",
+    "itemListElement": [
+        { "@@type": "ListItem", "position": 1, "name": "خانه", "item": "https://vamgard.org/" },
+        { "@@type": "ListItem", "position": 2, "name": "وام‌ها", "item": "https://vamgard.org/Loans" },
+        { "@@type": "ListItem", "position": 3, "name": "@Model.LoanType.Name", "item": "https://vamgard.org/type/@Model.LoanType.Slug" },
+        { "@@type": "ListItem", "position": 4, "name": "@Model.Title", "item": "https://vamgard.org/vam/@Model.Slug" }
+    ]
+}
+</script>
+
+@functions {
+    string FormatAmount(long amount)
+    {
+        if (amount >= 1_000_000_000)
+        {
+            var v = amount / 1_000_000_000.0;
+            return v == Math.Floor(v) ? $"{v:0} میلیارد تومان" : $"{v:0.#} میلیارد تومان";
+        }
+        if (amount >= 1_000_000)
+        {
+            var v = amount / 1_000_000.0;
+            return v == Math.Floor(v) ? $"{v:0} میلیون تومان" : $"{v:0.#} میلیون تومان";
+        }
+        return amount.ToString("N0") + " تومان";
+    }
+}

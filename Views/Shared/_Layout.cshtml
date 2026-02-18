@@ -1,0 +1,496 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@(ViewData["Title"] != null ? ViewData["Title"] + " | وام‌گرد" : "وام‌گرد - مرجع جامع مقایسه وام‌های بانکی ایران")</title>
+    <meta name="description" content="@(ViewData["MetaDescription"] ?? "وام‌گرد: مرجع جامع مقایسه انواع وام‌های بانکی ایران. وام مسکن، ازدواج، خودرو، تحصیلی و تسهیلات بانکی.")" />
+    <meta name="keywords" content="@(ViewData["MetaKeywords"] ?? "وام, وام بانکی, تسهیلات بانکی, وام مسکن, وام ازدواج, وام خودرو, مقایسه وام, بانک, نرخ سود, وام گرد")" />
+    <link rel="canonical" href="@(ViewData["CanonicalUrl"] ?? "https://vamgard.org")" />
+    <meta property="og:title" content="@(ViewData["OgTitle"] ?? ViewData["Title"] ?? "وام‌گرد")" />
+    <meta property="og:description" content="@(ViewData["MetaDescription"] ?? "مرجع جامع مقایسه وام‌های بانکی ایران")" />
+    <meta property="og:type" content="website" />
+    <meta property="og:locale" content="fa_IR" />
+    <meta property="og:site_name" content="وام‌گرد" />
+    <meta property="og:url" content="@(ViewData["CanonicalUrl"] ?? "https://vamgard.org")" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="robots" content="@(ViewData["Robots"] ?? "index, follow")" />
+    <meta name="theme-color" content="#0f172a" />
+    <link rel="alternate" hreflang="fa" href="@(ViewData["CanonicalUrl"] ?? "https://vamgard.org")" />
+    <link rel="alternate" hreflang="x-default" href="@(ViewData["CanonicalUrl"] ?? "https://vamgard.org")" />
+    <meta name="author" content="وام‌گرد" />
+    <meta name="language" content="Persian" />
+    <meta name="geo.region" content="IR" />
+    <meta name="geo.placename" content="Iran" />
+    <meta name="format-detection" content="telephone=no" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="icon" type="image/x-icon" href="/favicon.ico" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.svg" />
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.rtl.min.css" rel="stylesheet" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@100..900&display=swap" rel="stylesheet" />
+
+    <style>
+        :root {
+            --navy: #0f172a;
+            --navy-light: #1e293b;
+            --blue: #2563eb;
+            --blue-light: #3b82f6;
+            --blue-glow: rgba(37,99,235,.12);
+            --emerald: #059669;
+            --emerald-light: #10b981;
+            --amber: #d97706;
+            --amber-light: #f59e0b;
+            --red: #dc2626;
+            --slate: #64748b;
+            --slate-light: #94a3b8;
+            --surface: #ffffff;
+            --bg: #f8fafc;
+            --bg-alt: #e2e8f0;
+            --text: #0f172a;
+            --text-muted: #64748b;
+            --shadow-sm: 0 1px 3px rgba(0,0,0,.06);
+            --shadow-md: 0 4px 16px rgba(0,0,0,.08);
+            --shadow-lg: 0 10px 40px rgba(0,0,0,.1);
+            --radius-lg: 16px;
+            --radius-xl: 24px;
+        }
+        * { font-family: 'Vazirmatn', Tahoma, sans-serif; }
+        body { background: var(--bg); color: var(--text); line-height: 1.85; font-size: .95rem; }
+
+        /* Navbar */
+        .main-nav { background: var(--navy); border-bottom: 1px solid rgba(255,255,255,.06); position: sticky; top: 0; z-index: 1000; }
+        .main-nav .container { max-width: 1200px; }
+        .navbar-brand { font-weight: 900; font-size: 1.35rem; color: #fff !important; letter-spacing: -.02em; }
+        .navbar-brand span { background: linear-gradient(135deg, var(--blue-light), var(--emerald-light)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+        .nav-link { color: rgba(255,255,255,.7) !important; font-weight: 500; font-size: .9rem; padding: .6rem 1rem !important; border-radius: 8px; transition: all .2s; }
+        .nav-link:hover, .nav-link.active { color: #fff !important; background: rgba(255,255,255,.08); }
+
+        /* Hero */
+        .hero { background: var(--navy); position: relative; overflow: hidden; padding: 3rem 0 0; }
+        .hero::before { content: ''; position: absolute; inset: 0; background: radial-gradient(ellipse 80% 60% at 20% 100%, rgba(37,99,235,.15), transparent), radial-gradient(ellipse 60% 50% at 80% 0%, rgba(5,150,105,.1), transparent); }
+        .hero-content { position: relative; z-index: 2; }
+        .hero h1 { font-weight: 900; font-size: 2.3rem; line-height: 1.35; color: #fff; }
+        .hero h1 em { font-style: normal; background: linear-gradient(135deg, var(--blue-light), var(--emerald-light)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+        .hero p { color: var(--slate-light); font-size: 1.05rem; }
+
+        /* Apple-style search */
+        .apple-search { max-width: 520px; margin: 0 auto; position: relative; }
+        .apple-search input {
+            width: 100%; background: rgba(255,255,255,.12); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255,255,255,.18); border-radius: 50px; padding: .85rem 1.5rem .85rem 3.2rem;
+            color: #fff; font-size: .92rem; transition: all .3s; outline: none;
+        }
+        .apple-search input::placeholder { color: rgba(255,255,255,.4); }
+        .apple-search input:focus { background: rgba(255,255,255,.18); border-color: rgba(255,255,255,.35); box-shadow: 0 0 0 4px rgba(59,130,246,.15); }
+        .apple-search .search-icon { position: absolute; left: 1.1rem; top: 50%; transform: translateY(-50%); color: rgba(255,255,255,.4); font-size: 1rem; pointer-events: none; }
+        .apple-search button { position: absolute; right: 6px; top: 50%; transform: translateY(-50%); background: var(--blue); border: none; border-radius: 50px; padding: .5rem 1.1rem; color: #fff; font-weight: 600; font-size: .82rem; transition: all .2s; }
+        .apple-search button:hover { background: var(--blue-light); }
+
+        .hero-stats { display: flex; gap: 2rem; margin-top: 1.5rem; }
+        .hero-stat { color: var(--slate-light); font-size: .88rem; }
+        .hero-stat strong { color: #fff; font-size: 1.15rem; margin-left: .3rem; }
+
+        /* Floating loan bubbles */
+        .loan-bubbles-container { position: absolute; inset: 0; pointer-events: none; z-index: 1; }
+        .loan-bubble {
+            position: absolute;
+            display: flex; align-items: center; gap: .5rem;
+            background: rgba(255,255,255,.07); backdrop-filter: blur(12px);
+            border: 1px solid rgba(255,255,255,.1); border-radius: 14px;
+            padding: .5rem .7rem;
+            pointer-events: none; white-space: nowrap;
+            opacity: 0; transition: opacity .6s ease;
+        }
+        .loan-bubble.visible { opacity: .8; animation: bubbleFloat 5s ease-in-out infinite; }
+        .loan-bubble img { width: 30px; height: 30px; border-radius: 8px; object-fit: contain; background: #fff; padding: 2px; flex-shrink: 0; }
+        .bubble-text { display: flex; flex-direction: column; line-height: 1.2; }
+        .bubble-bank { color: rgba(255,255,255,.9); font-size: .68rem; font-weight: 700; }
+        .bubble-info { color: rgba(255,255,255,.5); font-size: .6rem; font-weight: 400; }
+
+        .bubble-0 { top: 0; right: -100px; }
+        .bubble-1 { bottom: 65px; left: -110px; animation-delay: 2.5s; }
+
+        @@keyframes bubbleFloat {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-8px); }
+        }
+
+        @@media (max-width: 992px) {
+            .loan-bubbles-container { display: none; }
+        }
+
+        /* Bank carousel in hero */
+        .hero-banks { padding: 2rem 0 0; margin-top: 2rem; border-top: 1px solid rgba(255,255,255,.06); position: relative; }
+        .carousel-track { display: flex; gap: 0; direction: ltr; width: max-content; will-change: transform; }
+        .carousel-wrapper { overflow: hidden; mask-image: linear-gradient(to right, transparent 0%, black 3%, black 97%, transparent 100%); -webkit-mask-image: linear-gradient(to right, transparent 0%, black 3%, black 97%, transparent 100%); padding-bottom: 1.5rem; }
+
+        .bank-show-item { width: 210px; flex-shrink: 0; background: rgba(255,255,255,.04); border: 1px solid rgba(255,255,255,.08); border-radius: 20px; padding: 1.4rem 1rem 1rem; margin: 0 6px; transition: all .3s; text-align: center; }
+        .bank-show-item:hover { background: rgba(255,255,255,.08); border-color: rgba(255,255,255,.15); transform: translateY(-3px); }
+        .bank-show-header { display: flex; flex-direction: column; align-items: center; gap: .35rem; margin-bottom: .8rem; text-decoration: none; }
+        .bank-show-logo-wrap { width: 80px; height: 80px; border-radius: 20px; background: #fff; display: flex; align-items: center; justify-content: center; padding: 6px; box-shadow: 0 6px 24px rgba(0,0,0,.2); margin-bottom: .4rem; transition: transform .3s; }
+        .bank-show-item:hover .bank-show-logo-wrap { transform: scale(1.06); }
+        .bank-show-logo { width: 100%; height: 100%; border-radius: 14px; object-fit: contain; }
+        .bank-show-name { color: #fff; font-weight: 800; font-size: .92rem; line-height: 1.3; }
+        .bank-badge-neo { display: inline-block; font-size: .58rem; background: rgba(37,99,235,.3); color: var(--blue-light); padding: .1rem .4rem; border-radius: 4px; margin-top: .15rem; font-weight: 600; }
+        .bank-show-count { color: var(--slate-light); font-size: .72rem; font-weight: 400; }
+        .bank-loan-chips { display: flex; flex-wrap: wrap; gap: .3rem; justify-content: center; }
+        .bank-loan-chip { display: inline-block; background: rgba(37,99,235,.15); color: var(--blue-light); padding: .18rem .5rem; border-radius: 8px; font-size: .68rem; font-weight: 500; text-decoration: none; transition: all .2s; white-space: nowrap; }
+        .bank-loan-chip:hover { background: var(--blue); color: #fff; }
+        .bank-loan-chip .chip-rate { color: var(--amber-light); margin-right: .2rem; font-weight: 700; }
+        .bank-loan-chip.chip-more { background: rgba(255,255,255,.08); color: var(--slate-light); }
+
+        /* Loan Card - NO absolute badges */
+        .card { border: 1px solid rgba(0,0,0,.06); border-radius: var(--radius-lg); box-shadow: var(--shadow-sm); transition: all .3s cubic-bezier(.4,0,.2,1); overflow: hidden; background: var(--surface); }
+        .card:hover { box-shadow: var(--shadow-lg); transform: translateY(-3px); }
+        .loan-card { position: relative; }
+        .loan-card.is-hot { border-top: 3px solid var(--red); }
+        .loan-card.is-featured { border-top: 3px solid var(--amber); }
+        .loan-card .card-top { padding: 1.15rem 1.15rem .4rem; display: flex; align-items: center; gap: .5rem; }
+        .loan-card .bank-name { display: inline-flex; align-items: center; gap: .35rem; color: var(--blue); font-size: .8rem; font-weight: 600; text-decoration: none; }
+        .loan-card .bank-name img { width: 22px; height: 22px; border-radius: 5px; object-fit: contain; }
+        .loan-card .bank-name:hover { color: var(--blue-light); }
+        .loan-card .card-tag { padding: .15rem .45rem; border-radius: 5px; font-size: .68rem; font-weight: 700; white-space: nowrap; margin-right: auto; }
+        .loan-card .tag-hot { background: rgba(220,38,38,.1); color: var(--red); }
+        .loan-card .tag-featured { background: rgba(217,119,6,.1); color: var(--amber); }
+        .loan-card .rate-pill { background: rgba(5,150,105,.08); color: var(--emerald); padding: .15rem .5rem; border-radius: 5px; font-size: .76rem; font-weight: 700; white-space: nowrap; }
+        .loan-card h5 { font-weight: 700; font-size: .96rem; margin: .5rem 0 .25rem; padding: 0 1.15rem; }
+        .loan-card h5 a { color: var(--text); text-decoration: none; }
+        .loan-card h5 a:hover { color: var(--blue); }
+        .loan-card .card-desc { padding: 0 1.15rem; color: var(--text-muted); font-size: .82rem; margin-bottom: .75rem; line-height: 1.6; }
+        .loan-card .card-meta { padding: .65rem 1.15rem; border-top: 1px solid rgba(0,0,0,.05); display: flex; gap: 1rem; font-size: .8rem; }
+        .loan-card .card-meta .meta-item { display: flex; flex-direction: column; }
+        .loan-card .card-meta .meta-label { color: var(--slate-light); font-size: .7rem; }
+        .loan-card .card-meta .meta-value { font-weight: 700; color: var(--text); }
+        .loan-card .card-actions { padding: .65rem 1.15rem 1.15rem; display: flex; gap: .5rem; }
+
+        /* Buttons */
+        .btn-primary-custom { background: var(--blue); color: #fff; border: none; border-radius: 10px; padding: .5rem 1.1rem; font-weight: 600; font-size: .84rem; transition: all .2s; }
+        .btn-primary-custom:hover { background: var(--blue-light); color: #fff; box-shadow: 0 4px 16px rgba(37,99,235,.3); }
+        .btn-outline-custom { background: transparent; color: var(--blue); border: 1.5px solid var(--blue); border-radius: 10px; padding: .45rem 1rem; font-weight: 600; font-size: .84rem; transition: all .2s; }
+        .btn-outline-custom:hover { background: var(--blue); color: #fff; }
+        .btn-ext-link { background: var(--emerald); color: #fff; border: none; border-radius: 10px; padding: .5rem 1.1rem; font-weight: 600; font-size: .84rem; transition: all .2s; }
+        .btn-ext-link:hover { background: var(--emerald-light); color: #fff; }
+
+        /* Section */
+        .section { padding: 3.5rem 0; }
+        .section-alt { background: var(--surface); }
+        .section-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; }
+        .section-header h2 { font-weight: 800; font-size: 1.35rem; display: flex; align-items: center; gap: .6rem; }
+        .section-header h2 .icon-box { width: 38px; height: 38px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 1rem; }
+
+        /* Type Cards */
+        .type-card { background: var(--surface); border: 1px solid rgba(0,0,0,.06); border-radius: var(--radius-lg); padding: 1.5rem 1rem; text-align: center; text-decoration: none; color: var(--text); transition: all .3s; display: block; }
+        .type-card:hover { border-color: var(--blue); box-shadow: 0 0 0 3px var(--blue-glow); transform: translateY(-3px); color: var(--text); }
+        .type-card .type-icon { width: 50px; height: 50px; border-radius: 13px; background: var(--blue-glow); display: flex; align-items: center; justify-content: center; margin: 0 auto .6rem; font-size: 1.3rem; color: var(--blue); transition: all .3s; }
+        .type-card:hover .type-icon { background: var(--blue); color: #fff; }
+        .type-card h6 { font-weight: 700; margin-bottom: .15rem; font-size: .9rem; }
+
+        /* Bank Cards */
+        .bank-card { background: var(--surface); border: 1px solid rgba(0,0,0,.06); border-radius: var(--radius-lg); padding: 1.5rem; text-align: center; text-decoration: none; color: var(--text); transition: all .3s; }
+        .bank-card:hover { border-color: var(--blue); box-shadow: var(--shadow-md); transform: translateY(-2px); }
+        .bank-card-logo { width: 56px; height: 56px; border-radius: 14px; object-fit: contain; margin: 0 auto .75rem; display: block; background: #fff; padding: 3px; border: 1px solid rgba(0,0,0,.06); }
+
+        /* Filter / Form */
+        .filter-bar { background: var(--surface); border: 1px solid rgba(0,0,0,.06); border-radius: var(--radius-xl); padding: 1.75rem; box-shadow: var(--shadow-sm); margin-bottom: 2rem; }
+        .form-control, .form-select { border-radius: 10px; border: 1.5px solid var(--bg-alt); padding: .65rem 1rem; font-size: .9rem; }
+        .form-control:focus, .form-select:focus { border-color: var(--blue); box-shadow: 0 0 0 3px var(--blue-glow); }
+
+        /* Breadcrumb */
+        .breadcrumb { background: transparent; padding: 0; font-size: .85rem; }
+        .breadcrumb-item a { color: var(--blue); text-decoration: none; }
+
+        /* Footer */
+        footer { background: var(--navy); color: rgba(255,255,255,.6); padding: 3.5rem 0 1.5rem; margin-top: 4rem; }
+        footer h6 { color: #fff; font-weight: 700; margin-bottom: 1rem; font-size: .95rem; }
+        footer a { color: rgba(255,255,255,.6); text-decoration: none; transition: color .2s; }
+        footer a:hover { color: #fff; }
+        footer .footer-brand { font-weight: 900; font-size: 1.2rem; color: #fff; margin-bottom: .75rem; }
+        footer .footer-brand span { background: linear-gradient(135deg, var(--blue-light), var(--emerald-light)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .footer-links li { padding: .2rem 0; }
+        .footer-links a::before { content: '\F285'; font-family: 'bootstrap-icons'; margin-left: .4rem; font-size: .65rem; opacity: .4; }
+        .footer-bottom { border-top: 1px solid rgba(255,255,255,.08); padding-top: 1.5rem; margin-top: 2rem; text-align: center; font-size: .8rem; }
+
+        .amount-display { font-weight: 700; color: var(--emerald); }
+        .view-count { display: inline-flex; align-items: center; gap: .3rem; color: var(--slate); font-size: .76rem; }
+        .container { max-width: 1200px; }
+    </style>
+    @RenderSection("Styles", required: false)
+</head>
+<body>
+    <nav class="main-nav navbar navbar-expand-lg navbar-dark">
+        <div class="container">
+            <a class="navbar-brand" asp-controller="Home" asp-action="Index">
+                <span>وام‌</span>گرد
+            </a>
+            <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="mainNav">
+                <ul class="navbar-nav me-auto gap-1">
+                    <li class="nav-item"><a class="nav-link" asp-controller="Home" asp-action="Index"><i class="bi bi-house-door-fill"></i> خانه</a></li>
+                    <li class="nav-item"><a class="nav-link" asp-controller="Loans" asp-action="Index"><i class="bi bi-grid-3x3-gap-fill"></i> وام‌ها</a></li>
+                    <li class="nav-item"><a class="nav-link" asp-controller="Banks" asp-action="Index"><i class="bi bi-bank2"></i> بانک‌ها</a></li>
+                    <li class="nav-item"><a class="nav-link" asp-controller="Blog" asp-action="Index"><i class="bi bi-journal-richtext"></i> وبلاگ</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <main>@RenderBody()</main>
+
+    <!-- Newsletter Section -->
+    <section style="background:linear-gradient(135deg, #1e3a5f 0%, #0f172a 100%);padding:3rem 0;margin-top:3rem;">
+        <div class="container text-center">
+            <h3 style="color:#fff;font-weight:800;font-size:1.4rem;margin-bottom:.5rem;">
+                <i class="bi bi-envelope-heart" style="color:var(--amber-light);"></i>
+                عضویت در خبرنامه وام‌گرد
+            </h3>
+            <p style="color:rgba(255,255,255,.6);font-size:.9rem;margin-bottom:1.5rem;">از جدیدترین وام‌ها و تسهیلات بانکی باخبر شوید.</p>
+            <form id="newsletterForm" style="max-width:480px;margin:0 auto;display:flex;gap:.5rem;">
+                @Html.AntiForgeryToken()
+                <input type="email" id="nlEmail" placeholder="ایمیل شما..." required
+                       style="flex:1;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.15);border-radius:50px;padding:.7rem 1.3rem;color:#fff;font-size:.88rem;outline:none;" />
+                <button type="submit" id="nlBtn"
+                        style="background:var(--blue);border:none;border-radius:50px;padding:.7rem 1.5rem;color:#fff;font-weight:600;font-size:.86rem;white-space:nowrap;transition:all .2s;">
+                    <i class="bi bi-send"></i> عضویت
+                </button>
+            </form>
+            <div id="nlMsg" style="margin-top:.75rem;font-size:.84rem;display:none;"></div>
+        </div>
+    </section>
+
+    <footer>
+        <div class="container">
+            <div class="row g-4">
+                <div class="col-lg-4">
+                    <div class="footer-brand"><span>وام‌</span>گرد</div>
+                    <p style="font-size:.86rem;">مرجع جامع مقایسه و بررسی انواع وام‌ها و تسهیلات بانکی ایران. تمامی اطلاعات وام‌های بانک‌های کشور را در یک مکان مشاهده و مقایسه کنید.</p>
+                </div>
+                <div class="col-6 col-lg-2">
+                    <h6>دسترسی سریع</h6>
+                    <ul class="list-unstyled footer-links">
+                        <li><a asp-controller="Loans" asp-action="Index">همه وام‌ها</a></li>
+                        <li><a asp-controller="Banks" asp-action="Index">بانک‌ها</a></li>
+                        <li><a asp-controller="Blog" asp-action="Index">وبلاگ</a></li>
+                    </ul>
+                </div>
+                <div class="col-6 col-lg-3">
+                    <h6>انواع وام</h6>
+                    <ul class="list-unstyled footer-links">
+                        <li><a href="/type/vam-maskan">وام مسکن</a></li>
+                        <li><a href="/type/vam-ezdevaj">وام ازدواج</a></li>
+                        <li><a href="/type/vam-khodro">وام خودرو</a></li>
+                        <li><a href="/type/vam-kasb-kar">وام کسب و کار</a></li>
+                        <li><a href="/type/gharz-ol-hasaneh">قرض‌الحسنه</a></li>
+                        <li><a href="/type/vam-online">وام آنلاین</a></li>
+                        <li><a href="/type/vam-bedone-zamen">وام بدون ضامن</a></li>
+                    </ul>
+                </div>
+                <div class="col-lg-3">
+                    <h6>بانک‌های محبوب</h6>
+                    <ul class="list-unstyled footer-links">
+                        <li><a href="/bank/bank-melli">بانک ملی</a></li>
+                        <li><a href="/bank/bank-mellat">بانک ملت</a></li>
+                        <li><a href="/bank/bank-maskan">بانک مسکن</a></li>
+                        <li><a href="/bank/bank-pasargad">بانک پاسارگاد</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p class="mb-0">&copy; @DateTime.Now.Year وام‌گرد (VamGard) &mdash; تمامی حقوق محفوظ است.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+    // Truly seamless infinite carousel - items never disappear
+    (function() {
+        var track = document.getElementById('bankCarousel');
+        if (!track) return;
+        var items = Array.from(track.querySelectorAll('.bank-show-item[data-original]'));
+        if (items.length === 0) return;
+
+        var itemW = items[0].offsetWidth + 12;
+        var setW = items.length * itemW;
+
+        // Create enough clones to guarantee the viewport is always covered
+        // We need at least: ceil(viewportWidth / setWidth) + 2 full copies on each side
+        function ensureClones() {
+            track.innerHTML = '';
+            itemW = 222; // 210px width + 12px gap
+            setW = items.length * itemW;
+            var needed = Math.ceil(window.innerWidth / setW) + 3;
+            var totalSets = needed * 2 + 1; // copies on both sides + original
+            for (var s = 0; s < totalSets; s++) {
+                for (var i = 0; i < items.length; i++) {
+                    var el = items[i].cloneNode(true);
+                    if (s === Math.floor(totalSets / 2)) el.setAttribute('data-original', '1');
+                    else el.removeAttribute('data-original');
+                    track.appendChild(el);
+                }
+            }
+            return totalSets;
+        }
+
+        var totalSets = ensureClones();
+        var pos = -(Math.floor(totalSets / 2)) * setW;
+        var speed = 0.5;
+        var autoPlay = true;
+        var dragging = false;
+        var startX = 0, dragStartPos = 0;
+        var resumeTimer = null;
+
+        function applyPos() {
+            track.style.transform = 'translate3d(' + pos + 'px,0,0)';
+        }
+
+        function wrapPos() {
+            if (setW <= 0) return;
+            var center = -(Math.floor(totalSets / 2)) * setW;
+            // When scrolled one full set to the left, jump back
+            while (pos < center - setW) pos += setW;
+            // When scrolled one full set to the right, jump forward
+            while (pos > center + setW) pos -= setW;
+        }
+
+        applyPos();
+
+        function step() {
+            if (autoPlay && !dragging && setW > 0) {
+                pos -= speed;
+                wrapPos();
+                applyPos();
+            }
+            requestAnimationFrame(step);
+        }
+        requestAnimationFrame(step);
+
+        track.addEventListener('mousedown', function(e) {
+            dragging = true; autoPlay = false;
+            startX = e.clientX; dragStartPos = pos;
+            track.style.cursor = 'grabbing';
+            e.preventDefault();
+            clearTimeout(resumeTimer);
+        });
+        window.addEventListener('mousemove', function(e) {
+            if (!dragging) return;
+            pos = dragStartPos + (e.clientX - startX);
+            wrapPos(); applyPos();
+        });
+        window.addEventListener('mouseup', function() {
+            if (!dragging) return;
+            dragging = false; track.style.cursor = 'grab';
+            resumeTimer = setTimeout(function() { autoPlay = true; }, 2000);
+        });
+        track.addEventListener('touchstart', function(e) {
+            dragging = true; autoPlay = false;
+            startX = e.touches[0].clientX; dragStartPos = pos;
+            clearTimeout(resumeTimer);
+        }, { passive: true });
+        track.addEventListener('touchmove', function(e) {
+            if (!dragging) return;
+            pos = dragStartPos + (e.touches[0].clientX - startX);
+            wrapPos(); applyPos();
+        }, { passive: true });
+        track.addEventListener('touchend', function() {
+            dragging = false;
+            resumeTimer = setTimeout(function() { autoPlay = true; }, 2000);
+        });
+        track.addEventListener('mouseenter', function() { if (!dragging) autoPlay = false; });
+        track.addEventListener('mouseleave', function() { if (!dragging) autoPlay = true; });
+        track.style.cursor = 'grab';
+
+        window.addEventListener('resize', function() {
+            totalSets = ensureClones();
+            pos = -(Math.floor(totalSets / 2)) * setW;
+            applyPos();
+        });
+    })();
+
+    // Newsletter form
+    (function() {
+        var form = document.getElementById('newsletterForm');
+        if (!form) return;
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
+            var email = document.getElementById('nlEmail').value;
+            var token = form.querySelector('input[name="__RequestVerificationToken"]').value;
+            var btn = document.getElementById('nlBtn');
+            var msg = document.getElementById('nlMsg');
+            btn.disabled = true;
+            btn.innerHTML = '<i class="bi bi-hourglass-split"></i>';
+
+            fetch('/Home/Subscribe', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: 'email=' + encodeURIComponent(email) + '&__RequestVerificationToken=' + encodeURIComponent(token)
+            })
+            .then(function(r) { return r.json(); })
+            .then(function(data) {
+                msg.style.display = 'block';
+                msg.style.color = data.success ? '#10b981' : '#f87171';
+                msg.textContent = data.message;
+                btn.disabled = false;
+                btn.innerHTML = '<i class="bi bi-send"></i> عضویت';
+                if (data.success) document.getElementById('nlEmail').value = '';
+            })
+            .catch(function() {
+                msg.style.display = 'block';
+                msg.style.color = '#f87171';
+                msg.textContent = 'خطایی رخ داد. دوباره تلاش کنید.';
+                btn.disabled = false;
+                btn.innerHTML = '<i class="bi bi-send"></i> عضویت';
+            });
+        });
+    })();
+
+    // Rotating loan bubbles
+    (function() {
+        var el = document.getElementById('bubbleData');
+        if (!el) return;
+        var loans = JSON.parse(el.textContent);
+        if (!loans.length) return;
+        var b0 = document.getElementById('bubble0');
+        var b1 = document.getElementById('bubble1');
+        if (!b0 || !b1) return;
+
+        function fmt(n) {
+            if (!n) return '';
+            var m = n / 10;
+            if (m >= 1e9) return (m / 1e9).toFixed(0) + ' میلیارد';
+            if (m >= 1e6) return (m / 1e6).toFixed(0) + ' میلیون';
+            return m.toLocaleString('fa');
+        }
+
+        var idx = 0;
+        function render(bubble, loan) {
+            var img = loan.logo ? '<img src="' + loan.logo + '" alt="">' : '';
+            var info = loan.type;
+            if (loan.rate) info += ' ' + loan.rate + '%';
+            var detail = loan.max ? 'تا ' + fmt(loan.max) + ' تومان' : loan.bank;
+            bubble.innerHTML = img + '<span class="bubble-text"><span class="bubble-bank">' + info + '</span><span class="bubble-info">' + detail + '</span></span>';
+        }
+
+        function rotate() {
+            b0.classList.remove('visible');
+            b1.classList.remove('visible');
+            setTimeout(function() {
+                render(b0, loans[idx % loans.length]);
+                render(b1, loans[(idx + 1) % loans.length]);
+                idx += 2;
+                b0.classList.add('visible');
+                setTimeout(function() { b1.classList.add('visible'); }, 800);
+            }, 600);
+        }
+
+        rotate();
+        setInterval(rotate, 5000);
+    })();
+    </script>
+    @RenderSection("Scripts", required: false)
+</body>
+</html>

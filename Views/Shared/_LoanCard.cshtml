@@ -1,0 +1,96 @@
+@model Loan
+@{
+    string? badge = ViewData["Badge"] as string;
+    var cardClass = "card loan-card h-100";
+    if (badge == "hot") cardClass += " is-hot";
+    else if (badge == "featured" || (badge == null && Model.IsFeatured)) cardClass += " is-featured";
+}
+<div class="@cardClass">
+    <div class="card-top">
+        <a href="/bank/@Model.Bank.Slug" class="bank-name">
+            @if (!string.IsNullOrEmpty(Model.Bank.LogoUrl))
+            {
+                <img src="@Model.Bank.LogoUrl" alt="@Model.Bank.Name" />
+            }
+            else
+            {
+                <i class="bi bi-bank2"></i>
+            }
+            @Model.Bank.Name
+        </a>
+
+        @if (badge == "hot")
+        {
+            <span class="card-tag tag-hot"><i class="bi bi-fire"></i> داغ</span>
+        }
+        else if (badge == "featured" || (badge == null && Model.IsFeatured))
+        {
+            <span class="card-tag tag-featured"><i class="bi bi-star-fill"></i> ویژه</span>
+        }
+        else
+        {
+            <span style="margin-right:auto;"></span>
+        }
+
+        @if (Model.InterestRate.HasValue)
+        {
+            <span class="rate-pill">@Model.InterestRate% سود</span>
+        }
+    </div>
+
+    <h5><a href="/vam/@Model.Slug">@Model.Title</a></h5>
+
+    @if (!string.IsNullOrEmpty(Model.ShortDescription))
+    {
+        <p class="card-desc">@Model.ShortDescription</p>
+    }
+
+    <div class="card-meta">
+        @if (Model.MaxAmount.HasValue)
+        {
+            <div class="meta-item">
+                <span class="meta-label">حداکثر مبلغ</span>
+                <span class="meta-value amount-display">@FormatAmount(Model.MaxAmount.Value)</span>
+            </div>
+        }
+        @if (Model.RepaymentMonths.HasValue)
+        {
+            <div class="meta-item">
+                <span class="meta-label">بازپرداخت</span>
+                <span class="meta-value">@Model.RepaymentMonths ماه</span>
+            </div>
+        }
+        <div class="meta-item" style="margin-right:auto;">
+            <span class="view-count"><i class="bi bi-eye"></i> @Model.ViewCount.ToString("N0")</span>
+        </div>
+    </div>
+
+    <div class="card-actions">
+        <a href="/vam/@Model.Slug" class="btn-primary-custom flex-grow-1 text-center text-decoration-none">
+            <i class="bi bi-arrow-left-circle"></i> جزئیات
+        </a>
+        @if (!string.IsNullOrEmpty(Model.ExternalUrl))
+        {
+            <a href="@Model.ExternalUrl" target="_blank" rel="nofollow noopener" class="btn-ext-link text-decoration-none" title="سایت بانک">
+                <i class="bi bi-box-arrow-up-left"></i>
+            </a>
+        }
+    </div>
+</div>
+
+@functions {
+    string FormatAmount(long amount)
+    {
+        if (amount >= 1_000_000_000)
+        {
+            var v = amount / 1_000_000_000.0;
+            return v == Math.Floor(v) ? $"{v:0} میلیارد تومان" : $"{v:0.#} میلیارد تومان";
+        }
+        if (amount >= 1_000_000)
+        {
+            var v = amount / 1_000_000.0;
+            return v == Math.Floor(v) ? $"{v:0} میلیون تومان" : $"{v:0.#} میلیون تومان";
+        }
+        return amount.ToString("N0") + " تومان";
+    }
+}
